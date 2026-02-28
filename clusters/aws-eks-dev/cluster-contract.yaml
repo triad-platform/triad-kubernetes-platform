@@ -1,0 +1,36 @@
+cluster:
+  name: triad-aws-eks-dev
+  environment: dev
+  region: us-east-1
+  kubernetesVersion: "1.30"
+
+landingZoneInputs:
+  vpcId: "<from-triad-landing-zones.vpc_id>"
+  privateSubnetIds:
+    - "<from-triad-landing-zones.eks_cluster_subnet_ids[0]>"
+    - "<from-triad-landing-zones.eks_cluster_subnet_ids[1]>"
+  publicSubnetIds:
+    - "<from-triad-landing-zones.ingress_public_subnet_ids[0]>"
+    - "<from-triad-landing-zones.ingress_public_subnet_ids[1]>"
+  availabilityZones:
+    - "<from-triad-landing-zones.availability_zones[0]>"
+    - "<from-triad-landing-zones.availability_zones[1]>"
+
+addons:
+  argocd: true
+  ingress: true
+  certManager: true
+  metricsBaseline: true
+  nats: true
+
+applications:
+  namespace: pulsecart
+  services:
+    - api-gateway
+    - orders
+    - worker
+    - notifications
+
+notes:
+  - Replace placeholder values with real Terraform outputs from triad-landing-zones/envs/dev.
+  - This file is the cluster bootstrap input contract, not a direct kubectl manifest.
