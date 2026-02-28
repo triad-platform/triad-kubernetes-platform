@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-bootstrap-notes
+  namespace: ingress-system
+data:
+  controller: "placeholder"
+  next_step: "replace with AWS ALB controller or chosen ingress controller manifests"

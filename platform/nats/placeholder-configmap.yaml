@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nats-bootstrap-notes
+  namespace: messaging
+data:
+  broker: "placeholder"
+  next_step: "replace with in-cluster NATS StatefulSet/Service or Helm release manifests"
