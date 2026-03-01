@@ -7,5 +7,7 @@ resources:
   - cert-manager.yaml
   - external-dns-prereqs.yaml
   - external-dns.yaml
+  - external-secrets-prereqs.yaml
+  - external-secrets.yaml
   - nats.yaml
   - observability-baseline.yaml

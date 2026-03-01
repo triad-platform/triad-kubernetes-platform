@@ -70,3 +70,11 @@ variable "external_dns_hosted_zone_arns" {
   type        = list(string)
   default     = ["arn:aws:route53:::hostedzone/Z03504361QPV5EQC43B1T"]
 }
+
+variable "external_secrets_secret_arns" {
+  description = "Secrets Manager secret ARNs external-secrets is allowed to read."
+  type        = list(string)
+  default = [
+    "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-b84b7356-92eb-43fd-bf93-df2842556b62-IxwMhw",
+  ]
+}

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-secrets-bootstrap
+  namespace: kube-system
+data:
+  note: "Bootstrap marker for the IRSA-backed external-secrets service account."

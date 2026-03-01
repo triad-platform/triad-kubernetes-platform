@@ -18,3 +18,11 @@ node_instance_types = ["t3.medium"]
 node_desired_size   = 1
 node_min_size       = 1
 node_max_size       = 2
+
+external_dns_hosted_zone_arns = [
+  "arn:aws:route53:::hostedzone/Z03504361QPV5EQC43B1T",
+]
+
+external_secrets_secret_arns = [
+  "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-REPLACE_ME",
+]

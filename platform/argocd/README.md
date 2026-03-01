@@ -30,6 +30,7 @@ Recommended initial split:
    - AWS Load Balancer Controller
    - cert-manager
    - external-dns
+   - external-secrets
    - metrics scraping baseline
    - NATS
 
@@ -58,7 +59,10 @@ Current platform app split:
 4. `external-dns`
    - Helm chart source
    - uses a pre-created IRSA-enabled service account in `platform/external-dns`
-5. `observability-baseline`
+5. `external-secrets`
+   - Helm chart source
+   - uses a pre-created IRSA-enabled service account in `platform/external-secrets`
+6. `observability-baseline`
    - repo path `platform/observability`
 
 Note:
