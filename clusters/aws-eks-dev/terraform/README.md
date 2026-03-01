@@ -9,6 +9,7 @@ Terraform root stack for the first Phase 2 EKS cluster.
 3. Enables IRSA
 4. Creates the IRSA role for the AWS Load Balancer Controller
 5. Creates the IRSA role for external-dns
+6. Creates the IRSA role for external-secrets
 
 ## Inputs
 
@@ -49,10 +50,12 @@ terraform plan
 
 1. You are ready to incur EKS cost
 2. The Route 53 / ACM path for `pulsecart-dev.cloudevopsguru.com` is defined
-3. You are ready to use the output `aws_load_balancer_controller_role_arn` to replace the placeholder in:
+3. You are ready to use the output `aws_load_balancer_controller_role_arn` to keep the manifest aligned:
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/ingress/serviceaccount.yaml`
-4. You are ready to use the output `external_dns_role_arn` to replace the placeholder in:
+4. You are ready to use the output `external_dns_role_arn` to keep the manifest aligned:
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-dns/serviceaccount.yaml`
+5. You are ready to use the output `external_secrets_role_arn` to keep the manifest aligned:
+   - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-secrets/serviceaccount.yaml`
 
 ## Cost Baseline
 

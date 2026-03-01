@@ -73,3 +73,63 @@ module "external_dns_irsa" {
 
   tags = var.tags
 }
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  eks_oidc_provider_hostpath = replace(
+    module.eks.oidc_provider_arn,
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/",
+    "",
+  )
+}
+
+data "aws_iam_policy_document" "external_secrets_assume_role" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [module.eks.oidc_provider_arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.eks_oidc_provider_hostpath}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.eks_oidc_provider_hostpath}:sub"
+      values   = ["system:serviceaccount:kube-system:external-secrets"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "external_secrets_access" {
+  statement {
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = var.external_secrets_secret_arns
+  }
+}
+
+resource "aws_iam_role" "external_secrets" {
+  name               = "${var.cluster_name}-external-secrets"
+  assume_role_policy = data.aws_iam_policy_document.external_secrets_assume_role.json
+  tags               = var.tags
+}
+
+resource "aws_iam_policy" "external_secrets_access" {
+  name   = "${var.cluster_name}-external-secrets-access"
+  policy = data.aws_iam_policy_document.external_secrets_access.json
+  tags   = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "external_secrets_access" {
+  role       = aws_iam_role.external_secrets.name
+  policy_arn = aws_iam_policy.external_secrets_access.arn
+}

@@ -65,15 +65,15 @@ Keep the first set intentionally small:
 2. AWS Load Balancer Controller (ALB)
 3. cert-manager
 4. external-dns
-5. metrics scrape baseline
-6. NATS
+5. external-secrets
+6. metrics scrape baseline
+7. NATS
 
 Deferred:
 
 1. service mesh
-2. external-secrets
-3. policy webhooks
-4. cluster autoscaling optimization
+2. policy webhooks
+3. cluster autoscaling optimization
 
 ## Concrete Phase 2 Runtime Targets
 
