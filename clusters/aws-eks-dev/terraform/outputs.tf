@@ -23,6 +23,11 @@ output "aws_load_balancer_controller_role_arn" {
   value       = module.aws_load_balancer_controller_irsa.iam_role_arn
 }
 
+output "external_dns_role_arn" {
+  description = "IRSA role ARN for the external-dns service account."
+  value       = module.external_dns_irsa.iam_role_arn
+}
+
 output "configure_kubectl_command" {
   description = "Command to update local kubeconfig for this cluster."
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"

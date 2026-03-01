@@ -29,6 +29,7 @@ Recommended initial split:
 1. `apps/platform`
    - AWS Load Balancer Controller
    - cert-manager
+   - external-dns
    - metrics scraping baseline
    - NATS
 
@@ -54,8 +55,12 @@ Current platform app split:
    - Helm chart source
 3. `nats`
    - repo path `platform/nats`
-4. `observability-baseline`
+4. `external-dns`
+   - Helm chart source
+   - uses a pre-created IRSA-enabled service account in `platform/external-dns`
+5. `observability-baseline`
    - repo path `platform/observability`
 
 Note:
 - Phase 2 public entry should ultimately resolve `pulsecart-dev.cloudevopsguru.com` through ALB to `api-gateway`.
+- After the first manual Route 53 bootstrap, `external-dns` is the intended automation path for keeping that record in sync.
