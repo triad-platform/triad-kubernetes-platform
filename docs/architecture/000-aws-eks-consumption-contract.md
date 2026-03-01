@@ -98,6 +98,7 @@ This repo consumes that contract and converts it into:
 3. Services
 4. Ingress
 5. ConfigMaps and Secrets
+6. environment overlays that pin the live image refs ArgoCD reconciles
 
 ## Phase 2 Success Criteria (Platform Layer)
 

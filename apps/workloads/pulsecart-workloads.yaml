@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/triad-platform/triad-app.git
+    repoURL: https://github.com/triad-platform/triad-kubernetes-platform.git
     targetRevision: develop
-    path: deploy/k8s
+    path: workloads/pulsecart/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: pulsecart
@@ -19,5 +19,5 @@ spec:
     syncOptions:
       - CreateNamespace=true
 
-# Starter application for PulseCart workloads.
-# The repo URL is now real. Runtime dependency endpoints and secrets still need environment overlays.
+# PulseCart dev workloads are now reconciled from the platform repo overlay.
+# The overlay pulls the app base from triad-app and owns the live image pins for the dev cluster.

@@ -1,0 +1,22 @@
+# triad-app source revision: MANAGED_BY_CI
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: pulsecart
+
+resources:
+  - https://github.com/triad-platform/triad-app//deploy/k8s?ref=develop
+
+images:
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-api-gateway
+    newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-api-gateway
+    newTag: b412b873845965ff94741558b910c4dd5bbbf0bf6344f536bb663938f3125908
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-orders
+    newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-orders
+    newTag: 995d5055c983848defdd97a33ee50286541e7a2b5335514ee22edbb37e52b1ab
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-notifications
+    newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-notifications
+    newTag: af652fb766b33ec1c989966e8ba286a7ba48fdc42f5b7d4584be1fa73b7ee75f
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-worker
+    newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-worker
+    newTag: c3f45bc5a499cc4f9a517a98f7376e790a0d85cf347a305d96e9f252d2ce0a78
