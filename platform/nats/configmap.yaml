@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nats-config
+  namespace: messaging
+data:
+  nats.conf: |
+    port: 4222
+    http: 8222
+    server_name: triad-nats

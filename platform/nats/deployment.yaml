@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: triad-nats
+  namespace: messaging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: triad-nats
+  template:
+    metadata:
+      labels:
+        app: triad-nats
+    spec:
+      containers:
+        - name: nats
+          image: nats:2.10-alpine
+          args:
+            - -c
+            - /etc/nats-config/nats.conf
+          ports:
+            - containerPort: 4222
+              name: client
+            - containerPort: 8222
+              name: monitor
+          livenessProbe:
+            httpGet:
+              path: /
+              port: monitor
+          readinessProbe:
+            tcpSocket:
+              port: client
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nats-config
+      volumes:
+        - name: config
+          configMap:
+            name: nats-config

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-load-balancer-controller-bootstrap
+  namespace: kube-system
+data:
+  cluster_name: triad-aws-eks-dev
+  aws_region: us-east-1
+  vpc_id: vpc-0980661f4e1fb3aa3
+  dns_host: pulsecart-dev.cloudevopsguru.com
+  certificate_arn: arn:aws:acm:us-east-1:971146591534:certificate/f3bbb4b7-ecf3-4cde-83f6-87a57ea0c075
+  note: IRSA role ARN is now wired; next step is ALB controller sync followed by workload ingress sync

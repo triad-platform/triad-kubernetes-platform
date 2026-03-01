@@ -1,0 +1,20 @@
+aws_region         = "us-east-1"
+cluster_name       = "triad-aws-eks-dev"
+kubernetes_version = "1.30"
+
+vpc_id = "vpc-0980661f4e1fb3aa3"
+
+private_subnet_ids = [
+  "subnet-03dc56e247d58165a",
+  "subnet-0e7de01b411f358d2",
+]
+
+public_subnet_ids = [
+  "subnet-054fd2c237a8afd07",
+  "subnet-07e70eab498bc9ebd",
+]
+
+node_instance_types = ["t3.medium"]
+node_desired_size   = 1
+node_min_size       = 1
+node_max_size       = 2

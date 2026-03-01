@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: triad-nats
+  namespace: messaging
+spec:
+  selector:
+    app: triad-nats
+  ports:
+    - name: client
+      port: 4222
+      targetPort: client
+    - name: monitor
+      port: 8222
+      targetPort: monitor

@@ -38,12 +38,29 @@ The Kubernetes platform layer must deliver:
 4. platform add-on reconciliation path
 5. app workload reconciliation path
 
+The current implementation now includes:
+
+1. `clusters/aws-eks-dev/terraform`
+   - first EKS Terraform root
+2. `platform/ingress`
+   - AWS Load Balancer Controller IRSA service account contract
+3. `platform/nats`
+   - first in-cluster NATS Deployment + Service path
+
+Subnet ownership model for this phase:
+
+1. `triad-landing-zones` creates the shared subnets
+2. `triad-landing-zones` applies the Kubernetes discovery tags required by EKS and ALB
+3. `triad-kubernetes-platform` consumes already tagged subnet IDs
+
+This is the cleaner standard because the cluster repo does not mutate shared network primitives.
+
 ## First Add-On Set
 
 Keep the first set intentionally small:
 
 1. ArgoCD
-2. ingress controller
+2. AWS Load Balancer Controller (ALB)
 3. cert-manager
 4. metrics scrape baseline
 5. NATS
@@ -54,6 +71,16 @@ Deferred:
 2. external-secrets
 3. policy webhooks
 4. cluster autoscaling optimization
+
+## Concrete Phase 2 Runtime Targets
+
+This repo should assume the following first deployment model:
+
+1. RDS PostgreSQL is AWS-managed and external to the cluster
+2. ElastiCache Redis is AWS-managed and external to the cluster
+3. NATS remains self-hosted in-cluster
+4. Public entry uses ALB, not NGINX
+5. First dev DNS host is `pulsecart-dev.cloudevopsguru.com`
 
 ## Application Runtime Expectations
 
