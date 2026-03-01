@@ -10,6 +10,7 @@ Bootstrap ArgoCD so the AWS-first PulseCart deployment can be reconciled from gi
 
 1. ArgoCD installation manifests or Helm values
 2. Root applications for platform add-ons and app workloads
+3. A mix of Helm-backed and repo-path-backed Application definitions
 
 ## Contract
 
@@ -26,7 +27,7 @@ The cluster/runtime standards are defined by:
 Recommended initial split:
 
 1. `apps/platform`
-   - ingress
+   - AWS Load Balancer Controller
    - cert-manager
    - metrics scraping baseline
    - NATS
@@ -44,5 +45,17 @@ Current bootstrap starter:
     - `apps/platform`
     - `apps/workloads`
 
+Current platform app split:
+
+1. `aws-load-balancer-controller`
+   - Helm chart source
+   - uses a pre-created IRSA-enabled service account in `platform/ingress`
+2. `cert-manager`
+   - Helm chart source
+3. `nats`
+   - repo path `platform/nats`
+4. `observability-baseline`
+   - repo path `platform/observability`
+
 Note:
-- `repoURL` values are placeholders and should be replaced with the real repository remotes before bootstrap.
+- Phase 2 public entry should ultimately resolve `pulsecart-dev.cloudevopsguru.com` through ALB to `api-gateway`.

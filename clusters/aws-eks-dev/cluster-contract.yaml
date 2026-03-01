@@ -5,16 +5,16 @@ cluster:
   kubernetesVersion: "1.30"
 
 landingZoneInputs:
-  vpcId: "<from-triad-landing-zones.vpc_id>"
+  vpcId: "vpc-0980661f4e1fb3aa3"
   privateSubnetIds:
-    - "<from-triad-landing-zones.eks_cluster_subnet_ids[0]>"
-    - "<from-triad-landing-zones.eks_cluster_subnet_ids[1]>"
+    - "subnet-03dc56e247d58165a"
+    - "subnet-0e7de01b411f358d2"
   publicSubnetIds:
-    - "<from-triad-landing-zones.ingress_public_subnet_ids[0]>"
-    - "<from-triad-landing-zones.ingress_public_subnet_ids[1]>"
+    - "subnet-054fd2c237a8afd07"
+    - "subnet-07e70eab498bc9ebd"
   availabilityZones:
-    - "<from-triad-landing-zones.availability_zones[0]>"
-    - "<from-triad-landing-zones.availability_zones[1]>"
+    - "us-east-1a"
+    - "us-east-1b"
 
 addons:
   argocd: true
@@ -32,5 +32,5 @@ applications:
     - notifications
 
 notes:
-  - Replace placeholder values with real Terraform outputs from triad-landing-zones/envs/dev.
+  - These values now reflect the current triad-landing-zones dev outputs.
   - This file is the cluster bootstrap input contract, not a direct kubectl manifest.

@@ -1,0 +1,5 @@
+bucket         = "triad-terraform-state"
+key            = "triad-kubernetes-platform/aws-eks-dev/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "triad-terraform-locks"
+encrypt        = true

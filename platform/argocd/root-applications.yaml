@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/example/triad-kubernetes-platform.git
+    repoURL: https://github.com/triad-platform/triad-kubernetes-platform.git
     targetRevision: develop
     path: apps/platform
   destination:
@@ -28,7 +28,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/example/triad-kubernetes-platform.git
+    repoURL: https://github.com/triad-platform/triad-kubernetes-platform.git
     targetRevision: develop
     path: apps/workloads
   destination:

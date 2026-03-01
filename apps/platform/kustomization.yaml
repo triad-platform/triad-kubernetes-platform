@@ -2,4 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - platform-addons.yaml
+  - aws-load-balancer-controller-prereqs.yaml
+  - aws-load-balancer-controller.yaml
+  - cert-manager.yaml
+  - nats.yaml
+  - observability-baseline.yaml

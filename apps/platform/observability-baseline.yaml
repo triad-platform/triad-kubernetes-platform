@@ -1,23 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: platform-addons
+  name: observability-baseline
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/example/triad-kubernetes-platform.git
+    repoURL: https://github.com/triad-platform/triad-kubernetes-platform.git
     targetRevision: develop
-    path: platform
+    path: platform/observability
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: observability
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
-# Starter application for platform add-ons.
-# The `platform/` path now exists and is Kustomize-valid, but the concrete controller manifests are still placeholders.

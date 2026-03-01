@@ -20,11 +20,13 @@ Application/runtime expectations are defined in:
 
 3. Ingress
    - external ingress terminates at `api-gateway`
+   - Phase 2 target ingress is AWS ALB
    - internal service-to-service traffic remains cluster-local
 
 4. Runtime config
    - environment variables delivered via ConfigMap/Secret split
    - no environment-specific values hardcoded in manifests
+   - app manifests may contain AWS-shaped placeholders that are replaced by environment overlays
 
 5. Health and rollout
    - `/healthz` and `/readyz` drive probes for HTTP services
@@ -32,6 +34,10 @@ Application/runtime expectations are defined in:
 
 6. Metrics
    - gateway, orders, and worker `/metrics` must be scrapeable
+
+7. Dependency placement
+   - RDS and ElastiCache are external AWS-managed dependencies
+   - NATS remains cluster-local in the first EKS deployment
 
 ## Deferred Standards
 
