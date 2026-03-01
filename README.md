@@ -14,3 +14,6 @@ Current Phase 2 starting points:
   - ALB controller + external-dns + external-secrets IRSA contracts and first in-cluster NATS manifests
 - `apps/platform/` and `apps/workloads/`
   - first ArgoCD application split with Helm + Kustomize sources
+- `workloads/pulsecart/dev/`
+  - dev GitOps overlay that pins the live workload image refs ArgoCD reconciles
+  - the platform repo now also owns the automatic cloud smoke workflow for deploy-state changes

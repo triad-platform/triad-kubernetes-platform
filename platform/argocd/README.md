@@ -35,10 +35,8 @@ Recommended initial split:
    - NATS
 
 2. `apps/workloads`
-   - api-gateway
-   - orders
-   - worker
-   - notifications
+   - workload `Application` definitions
+   - these now point at platform-owned environment overlays (for example `workloads/pulsecart/dev`) instead of pointing directly at app repos
 
 Current bootstrap starter:
 
