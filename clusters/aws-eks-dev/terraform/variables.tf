@@ -64,3 +64,9 @@ variable "tags" {
     ManagedBy   = "terraform"
   }
 }
+
+variable "external_dns_hosted_zone_arns" {
+  description = "Route 53 hosted zone ARNs external-dns is allowed to manage."
+  type        = list(string)
+  default     = ["arn:aws:route53:::hostedzone/Z03504361QPV5EQC43B1T"]
+}

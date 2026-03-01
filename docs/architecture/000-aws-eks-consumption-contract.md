@@ -46,6 +46,8 @@ The current implementation now includes:
    - AWS Load Balancer Controller IRSA service account contract
 3. `platform/nats`
    - first in-cluster NATS Deployment + Service path
+4. `platform/external-dns`
+   - external-dns IRSA service account contract for Route 53 automation
 
 Subnet ownership model for this phase:
 
@@ -62,8 +64,9 @@ Keep the first set intentionally small:
 1. ArgoCD
 2. AWS Load Balancer Controller (ALB)
 3. cert-manager
-4. metrics scrape baseline
-5. NATS
+4. external-dns
+5. metrics scrape baseline
+6. NATS
 
 Deferred:
 

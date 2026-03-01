@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-bootstrap
+  namespace: kube-system
+data:
+  provider: aws
+  domain_filter: cloudevopsguru.com
+  hosted_zone_id: Z03504361QPV5EQC43B1T
+  policy: upsert-only
+  registry: txt
+  txt_owner_id: triad-aws-eks-dev

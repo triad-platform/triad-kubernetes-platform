@@ -5,5 +5,7 @@ resources:
   - aws-load-balancer-controller-prereqs.yaml
   - aws-load-balancer-controller.yaml
   - cert-manager.yaml
+  - external-dns-prereqs.yaml
+  - external-dns.yaml
   - nats.yaml
   - observability-baseline.yaml
