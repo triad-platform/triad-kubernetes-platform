@@ -14,9 +14,9 @@ Scope:
 - It is not a production monitoring stack yet.
 - Persistent storage is now enabled with dynamically provisioned PVCs.
 - This now assumes the platform `gp3` CSI-backed `StorageClass` is present and the AWS EBS CSI add-on is enabled.
-- Grafana admin credentials are now secret-backed and should be rotated from the placeholder value immediately.
-- Alertmanager now uses a secret-backed config with an SNS receiver placeholder that should be replaced with a real topic ARN.
-- `external-secrets` now also watches the observability namespace and can merge AWS Secrets Manager values into those two secrets without a hard cutover.
+- Grafana admin credentials are now secret-backed through `external-secrets`.
+- Alertmanager now uses a secret-backed config with an SNS receiver path sourced through `external-secrets`.
+- `external-secrets` now owns those two secrets in the observability namespace, so Argo no longer competes with live secret data.
 - Long retention and HA come later.
 
 Current access pattern:
@@ -38,7 +38,7 @@ External-secrets migration path:
   - expected JSON keys: `admin_user`, `admin_password`
 - AWS secret name for Alertmanager: `triad/dev/observability/alertmanager`
   - expected JSON key: `config`
-- The `ExternalSecret` resources use `creationPolicy: Merge`, so the existing bootstrap secrets remain valid until AWS-backed values are available.
+- The `ExternalSecret` resources use `creationPolicy: Owner`, so the synced Kubernetes secrets are now owned by `external-secrets` rather than Argo bootstrap manifests.
 
 Preferred alert delivery path:
 - Create an SNS topic in `triad-landing-zones`
@@ -47,6 +47,6 @@ Preferred alert delivery path:
 - Store the final Alertmanager config in Secrets Manager with `sns_configs`
 
 Immediate next hardening steps:
-1. Replace the Grafana placeholder password in the `grafana-admin` secret with a real value.
-2. Replace the Alertmanager webhook placeholder in the `alertmanager-config` secret with a real Slack/email/PagerDuty-capable destination.
+1. Keep the AWS Secrets Manager values for `grafana-admin` and `alertmanager` as the source of truth and verify rotation still syncs cleanly.
+2. Verify the Alertmanager SNS path continues to deliver and resolve alerts cleanly.
 3. Increase retention and move from single-pod dev sizing to production-grade HA when this stack is promoted beyond dev.

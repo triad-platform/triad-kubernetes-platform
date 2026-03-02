@@ -7,7 +7,6 @@ resources:
   - secretstore.yaml
   - externalsecret-grafana-admin.yaml
   - externalsecret-alertmanager-config.yaml
-  - alertmanager-config-secret.yaml
   - alertmanager-pvc.yaml
   - alertmanager-deployment.yaml
   - alertmanager-service.yaml
@@ -19,7 +18,6 @@ resources:
   - grafana-datasources-configmap.yaml
   - grafana-dashboard-provider-configmap.yaml
   - grafana-dashboards-configmap.yaml
-  - grafana-admin-secret.yaml
   - grafana-pvc.yaml
   - grafana-deployment.yaml
   - grafana-service.yaml
