@@ -23,5 +23,6 @@ Current Phase 2 starting points:
   - starter dashboard and alert rules are deployed here, not just documented
   - persistent PVC-backed storage and a baseline Alertmanager are now part of the dev stack
   - Grafana admin and Alertmanager receiver config now use Kubernetes secrets instead of inline defaults
+  - `external-secrets` can now merge AWS-backed values into those observability secrets for a non-breaking migration
 - `platform/storage/`
   - cluster storage baseline with a default CSI-backed `gp3` `StorageClass`

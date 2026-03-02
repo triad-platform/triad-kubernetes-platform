@@ -76,5 +76,6 @@ variable "external_secrets_secret_arns" {
   type        = list(string)
   default = [
     "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-b84b7356-92eb-43fd-bf93-df2842556b62-IxwMhw",
+    "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/*",
   ]
 }

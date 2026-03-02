@@ -16,6 +16,7 @@ Scope:
 - This now assumes the platform `gp3` CSI-backed `StorageClass` is present and the AWS EBS CSI add-on is enabled.
 - Grafana admin credentials are now secret-backed and should be rotated from the placeholder value immediately.
 - Alertmanager now uses a secret-backed config with a webhook receiver placeholder that should be replaced with a real destination.
+- `external-secrets` now also watches the observability namespace and can merge AWS Secrets Manager values into those two secrets without a hard cutover.
 - Long retention and HA come later.
 
 Current access pattern:
@@ -30,6 +31,14 @@ Grafana bootstrap credentials:
 - user key: `admin-user`
 - password key: `admin-password`
 - current placeholder password: `CHANGE-ME-OBSERVABILITY-ADMIN`
+
+External-secrets migration path:
+- `SecretStore`: `observability-aws-secrets`
+- AWS secret name for Grafana: `triad/dev/observability/grafana-admin`
+  - expected JSON keys: `admin_user`, `admin_password`
+- AWS secret name for Alertmanager: `triad/dev/observability/alertmanager`
+  - expected JSON key: `config`
+- The `ExternalSecret` resources use `creationPolicy: Merge`, so the existing bootstrap secrets remain valid until AWS-backed values are available.
 
 Immediate next hardening steps:
 1. Replace the Grafana placeholder password in the `grafana-admin` secret with a real value.

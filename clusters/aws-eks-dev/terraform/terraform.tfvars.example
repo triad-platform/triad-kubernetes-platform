@@ -25,4 +25,5 @@ external_dns_hosted_zone_arns = [
 
 external_secrets_secret_arns = [
   "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-REPLACE_ME",
+  "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/*",
 ]

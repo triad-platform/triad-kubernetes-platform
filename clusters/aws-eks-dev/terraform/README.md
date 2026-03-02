@@ -58,6 +58,8 @@ terraform plan
 5. You are ready to use the output `external_secrets_role_arn` to keep the manifest aligned:
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-secrets/serviceaccount.yaml`
 6. You are ready to use the output `ebs_csi_role_arn` as part of the cluster storage baseline and managed add-on posture.
+7. The external-secrets IAM policy should include the observability secret path if you want Grafana and Alertmanager config to come from Secrets Manager:
+   - `triad/dev/observability/*`
 
 ## Cost Baseline
 
