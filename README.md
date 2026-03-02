@@ -18,3 +18,6 @@ Current Phase 2 starting points:
   - dev GitOps overlay that pins the live workload image refs ArgoCD reconciles
   - the platform repo now also owns the automatic cloud smoke workflow for deploy-state changes
   - that smoke now validates both the public request contract and the async worker/notification completion path
+- `platform/observability/`
+  - real in-cluster Prometheus + Grafana dev baseline managed by ArgoCD
+  - starter dashboard and alert rules are deployed here, not just documented

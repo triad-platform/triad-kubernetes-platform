@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: observability
+data:
+  pulsecart-phase1-alerts.yml: |
+    groups:
+      - name: pulsecart-phase1
+        interval: 30s
+        rules:
+          - alert: PulseCartGatewayHigh5xxRate
+            expr: rate(triad_api_gateway_http_response_status_500_total[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+              service: api-gateway
+            annotations:
+              summary: "API Gateway 5xx rate elevated"
+              description: "triad_api_gateway_http_response_status_500_total has sustained elevated rate for 5m."
+
+          - alert: PulseCartGatewayTimeouts
+            expr: rate(triad_api_gateway_orders_forward_timeouts_total[5m]) > 0
+            for: 3m
+            labels:
+              severity: warning
+              service: api-gateway
+            annotations:
+              summary: "Gateway forwarding timeouts detected"
+              description: "Orders forwarding timeouts are non-zero over the last 5m window."
+
+          - alert: PulseCartOrdersPersistenceErrors
+            expr: rate(triad_orders_create_order_persistence_errors_total[5m]) > 0
+            for: 2m
+            labels:
+              severity: critical
+              service: orders
+            annotations:
+              summary: "Orders persistence errors detected"
+              description: "Orders service cannot reliably persist writes to Postgres."
+
+          - alert: PulseCartOrdersPublishErrors
+            expr: rate(triad_orders_create_order_publish_errors_total[5m]) > 0
+            for: 2m
+            labels:
+              severity: warning
+              service: orders
+            annotations:
+              summary: "Orders publish errors detected"
+              description: "Orders service failed to publish orders.created.v1 events."
+
+          - alert: PulseCartWorkerProcessingErrors
+            expr: rate(triad_worker_messages_errors_total[5m]) > 0
+            for: 5m
+            labels:
+              severity: warning
+              service: worker
+            annotations:
+              summary: "Worker processing errors detected"
+              description: "Worker has sustained message processing errors."
+
+          - alert: PulseCartWorkerDuplicateSpike
+            expr: rate(triad_worker_messages_duplicates_total[5m]) > 0.5
+            for: 10m
+            labels:
+              severity: info
+              service: worker
+            annotations:
+              summary: "Worker duplicate processing spike"
+              description: "Duplicate event suppression rate is elevated and may indicate producer replay behavior."
