@@ -1,4 +1,4 @@
-# triad-app source revision: MANAGED_BY_CI
+# triad-app source revision: 2b28301507e2265d72c5203ece463e2f33ce67ed
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
