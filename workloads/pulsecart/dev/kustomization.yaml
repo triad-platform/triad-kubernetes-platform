@@ -1,4 +1,4 @@
-# triad-app source revision: 2b28301507e2265d72c5203ece463e2f33ce67ed
+# triad-app source revision: 71e1ec43c85868a40d39209f669d4f606155db3d
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
