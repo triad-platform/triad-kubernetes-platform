@@ -79,3 +79,9 @@ variable "external_secrets_secret_arns" {
     "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/*",
   ]
 }
+
+variable "alertmanager_sns_topic_arns" {
+  description = "SNS topic ARNs Alertmanager is allowed to publish to via IRSA."
+  type        = list(string)
+  default     = []
+}

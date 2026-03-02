@@ -60,6 +60,7 @@ terraform plan
 6. You are ready to use the output `ebs_csi_role_arn` as part of the cluster storage baseline and managed add-on posture.
 7. The external-secrets IAM policy should include the observability secret path if you want Grafana and Alertmanager config to come from Secrets Manager:
    - `triad/dev/observability/*`
+8. Set `alertmanager_sns_topic_arns` when you want Alertmanager to publish directly to SNS through IRSA.
 
 ## Cost Baseline
 

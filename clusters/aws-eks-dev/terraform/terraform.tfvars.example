@@ -27,3 +27,7 @@ external_secrets_secret_arns = [
   "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-REPLACE_ME",
   "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/*",
 ]
+
+alertmanager_sns_topic_arns = [
+  "arn:aws:sns:us-east-1:971146591534:REPLACE_ME",
+]

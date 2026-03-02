@@ -15,7 +15,7 @@ Scope:
 - Persistent storage is now enabled with dynamically provisioned PVCs.
 - This now assumes the platform `gp3` CSI-backed `StorageClass` is present and the AWS EBS CSI add-on is enabled.
 - Grafana admin credentials are now secret-backed and should be rotated from the placeholder value immediately.
-- Alertmanager now uses a secret-backed config with a webhook receiver placeholder that should be replaced with a real destination.
+- Alertmanager now uses a secret-backed config with an SNS receiver placeholder that should be replaced with a real topic ARN.
 - `external-secrets` now also watches the observability namespace and can merge AWS Secrets Manager values into those two secrets without a hard cutover.
 - Long retention and HA come later.
 
@@ -39,6 +39,12 @@ External-secrets migration path:
 - AWS secret name for Alertmanager: `triad/dev/observability/alertmanager`
   - expected JSON key: `config`
 - The `ExternalSecret` resources use `creationPolicy: Merge`, so the existing bootstrap secrets remain valid until AWS-backed values are available.
+
+Preferred alert delivery path:
+- Create an SNS topic in `triad-landing-zones`
+- Subscribe your email to that topic
+- Grant Alertmanager IRSA permission to publish to the topic
+- Store the final Alertmanager config in Secrets Manager with `sns_configs`
 
 Immediate next hardening steps:
 1. Replace the Grafana placeholder password in the `grafana-admin` secret with a real value.

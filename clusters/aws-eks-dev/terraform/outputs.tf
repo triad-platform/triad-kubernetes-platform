@@ -38,6 +38,11 @@ output "ebs_csi_role_arn" {
   value       = module.ebs_csi_irsa.iam_role_arn
 }
 
+output "alertmanager_sns_role_arn" {
+  description = "IRSA role ARN for Alertmanager SNS publishing when SNS topics are configured."
+  value       = length(var.alertmanager_sns_topic_arns) > 0 ? aws_iam_role.alertmanager_sns[0].arn : null
+}
+
 output "configure_kubectl_command" {
   description = "Command to update local kubeconfig for this cluster."
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"

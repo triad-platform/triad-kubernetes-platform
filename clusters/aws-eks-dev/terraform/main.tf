@@ -154,3 +154,62 @@ resource "aws_iam_role_policy_attachment" "external_secrets_access" {
   role       = aws_iam_role.external_secrets.name
   policy_arn = aws_iam_policy.external_secrets_access.arn
 }
+
+data "aws_iam_policy_document" "alertmanager_sns_assume_role" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [module.eks.oidc_provider_arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.eks_oidc_provider_hostpath}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.eks_oidc_provider_hostpath}:sub"
+      values   = ["system:serviceaccount:observability:alertmanager"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "alertmanager_sns_publish" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+    resources = var.alertmanager_sns_topic_arns
+  }
+}
+
+resource "aws_iam_role" "alertmanager_sns" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  name               = "${var.cluster_name}-alertmanager-sns"
+  assume_role_policy = data.aws_iam_policy_document.alertmanager_sns_assume_role[0].json
+  tags               = var.tags
+}
+
+resource "aws_iam_policy" "alertmanager_sns_publish" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  name   = "${var.cluster_name}-alertmanager-sns-publish"
+  policy = data.aws_iam_policy_document.alertmanager_sns_publish[0].json
+  tags   = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "alertmanager_sns_publish" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  role       = aws_iam_role.alertmanager_sns[0].name
+  policy_arn = aws_iam_policy.alertmanager_sns_publish[0].arn
+}

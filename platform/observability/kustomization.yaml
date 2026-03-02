@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
+  - alertmanager-serviceaccount.yaml
   - secretstore.yaml
   - externalsecret-grafana-admin.yaml
   - externalsecret-alertmanager-config.yaml
