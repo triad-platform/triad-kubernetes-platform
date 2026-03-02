@@ -47,7 +47,7 @@ spec:
       volumes:
         - name: alertmanager-config
           secret:
-            name: alertmanager-config
+            secretName: alertmanager-config
         - name: alertmanager-data
           persistentVolumeClaim:
             claimName: alertmanager-data
