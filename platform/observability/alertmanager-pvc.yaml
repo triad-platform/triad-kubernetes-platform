@@ -4,6 +4,7 @@ metadata:
   name: alertmanager-data
   namespace: observability
 spec:
+  storageClassName: gp3
   accessModes:
     - ReadWriteOnce
   resources:

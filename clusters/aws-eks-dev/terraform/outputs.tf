@@ -33,6 +33,11 @@ output "external_secrets_role_arn" {
   value       = aws_iam_role.external_secrets.arn
 }
 
+output "ebs_csi_role_arn" {
+  description = "IRSA role ARN for the EBS CSI controller service account."
+  value       = module.ebs_csi_irsa.iam_role_arn
+}
+
 output "configure_kubectl_command" {
   description = "Command to update local kubeconfig for this cluster."
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"

@@ -13,7 +13,7 @@ Scope:
 - This is intentionally minimal and optimized for reproducibility in the dev cluster.
 - It is not a production monitoring stack yet.
 - Persistent storage is now enabled with dynamically provisioned PVCs.
-- This still assumes a working default storage class in the cluster.
+- This now assumes the platform `gp3` CSI-backed `StorageClass` is present and the AWS EBS CSI add-on is enabled.
 - Auth hardening, long retention, and HA come later.
 
 Current access pattern:

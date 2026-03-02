@@ -10,6 +10,7 @@ Terraform root stack for the first Phase 2 EKS cluster.
 4. Creates the IRSA role for the AWS Load Balancer Controller
 5. Creates the IRSA role for external-dns
 6. Creates the IRSA role for external-secrets
+7. Enables the AWS EBS CSI managed add-on with an IRSA role for the CSI controller
 
 ## Inputs
 
@@ -56,6 +57,7 @@ terraform plan
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-dns/serviceaccount.yaml`
 5. You are ready to use the output `external_secrets_role_arn` to keep the manifest aligned:
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-secrets/serviceaccount.yaml`
+6. You are ready to use the output `ebs_csi_role_arn` as part of the cluster storage baseline and managed add-on posture.
 
 ## Cost Baseline
 
