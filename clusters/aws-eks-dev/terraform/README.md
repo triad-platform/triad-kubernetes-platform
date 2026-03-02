@@ -64,6 +64,18 @@ terraform plan
 The default node group is intentionally minimal for learning:
 
 1. `t3.medium`
-2. desired size `1`
-3. min size `1`
-4. max size `2`
+2. desired size `2`
+3. min size `2`
+4. max size `3`
+
+This is now the practical floor for the current dev stack because:
+1. core EKS system pods
+2. ArgoCD
+3. ALB controller
+4. cert-manager
+5. external-dns
+6. external-secrets
+7. NATS
+8. PulseCart workloads
+9. observability pods
+all need headroom without hitting per-node pod limits.
