@@ -5,6 +5,8 @@ metadata:
   namespace: observability
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: prometheus
@@ -46,4 +48,5 @@ spec:
           configMap:
             name: prometheus-rules
         - name: prometheus-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: prometheus-data

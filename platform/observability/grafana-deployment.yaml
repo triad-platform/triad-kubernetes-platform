@@ -5,6 +5,8 @@ metadata:
   namespace: observability
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: grafana
@@ -52,4 +54,5 @@ spec:
           configMap:
             name: grafana-dashboards
         - name: grafana-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: grafana-data
