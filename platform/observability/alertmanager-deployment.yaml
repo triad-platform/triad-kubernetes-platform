@@ -15,9 +15,15 @@ spec:
       labels:
         app: alertmanager
     spec:
+      securityContext:
+        fsGroup: 65534
       containers:
         - name: alertmanager
           image: prom/alertmanager:v0.27.0
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
           args:
             - --config.file=/etc/alertmanager/alertmanager.yml
             - --storage.path=/alertmanager
