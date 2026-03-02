@@ -40,7 +40,7 @@ variable "node_instance_types" {
 variable "node_desired_size" {
   description = "Desired node group size."
   type        = number
-  default     = 2
+  default     = 3
 }
 
 variable "node_min_size" {
@@ -52,7 +52,7 @@ variable "node_min_size" {
 variable "node_max_size" {
   description = "Maximum node group size."
   type        = number
-  default     = 3
+  default     = 4
 }
 
 variable "tags" {

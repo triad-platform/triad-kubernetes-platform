@@ -64,9 +64,9 @@ terraform plan
 The default node group is intentionally minimal for learning:
 
 1. `t3.medium`
-2. desired size `2`
+2. desired size `3`
 3. min size `2`
-4. max size `3`
+4. max size `4`
 
 This is now the practical floor for the current dev stack because:
 1. core EKS system pods
@@ -79,3 +79,6 @@ This is now the practical floor for the current dev stack because:
 8. PulseCart workloads
 9. observability pods
 all need headroom without hitting per-node pod limits.
+
+If the cluster is already live and you hit scheduler events like `Too many pods`, update the real
+`terraform.tfvars` to the same `3/2/4` values and apply. That is the current expected dev capacity.
