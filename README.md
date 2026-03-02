@@ -22,5 +22,6 @@ Current Phase 2 starting points:
   - real in-cluster Prometheus + Grafana dev baseline managed by ArgoCD
   - starter dashboard and alert rules are deployed here, not just documented
   - persistent PVC-backed storage and a baseline Alertmanager are now part of the dev stack
+  - Grafana admin and Alertmanager receiver config now use Kubernetes secrets instead of inline defaults
 - `platform/storage/`
   - cluster storage baseline with a default CSI-backed `gp3` `StorageClass`

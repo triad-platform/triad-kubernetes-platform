@@ -45,7 +45,7 @@ spec:
               mountPath: /alertmanager
       volumes:
         - name: alertmanager-config
-          configMap:
+          secret:
             name: alertmanager-config
         - name: alertmanager-data
           persistentVolumeClaim:
