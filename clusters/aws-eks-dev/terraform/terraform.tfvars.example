@@ -1,6 +1,6 @@
 aws_region         = "us-east-1"
 cluster_name       = "triad-aws-eks-dev"
-kubernetes_version = "1.30"
+kubernetes_version = "1.35"
 
 vpc_id = "vpc-0980661f4e1fb3aa3"
 
@@ -25,7 +25,8 @@ external_dns_hosted_zone_arns = [
 
 external_secrets_secret_arns = [
   "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-REPLACE_ME",
-  "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/*",
+  "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/grafana-admin*",
+  "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/alertmanager*",
 ]
 
 alertmanager_sns_topic_arns = [

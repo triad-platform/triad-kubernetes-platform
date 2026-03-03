@@ -10,7 +10,7 @@ Available helpers:
 
 Example:
 ```bash
-/Users/lseino/triad-platform/triad-kubernetes-platform/scripts/eks-hop.sh 1.31
+/Users/lseino/triad-platform/triad-kubernetes-platform/scripts/eks-hop.sh 1.35
 ```
 
 Environment overrides:
