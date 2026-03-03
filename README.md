@@ -28,3 +28,6 @@ Current Phase 2 starting points:
   - cluster storage baseline with a default CSI-backed `gp3` `StorageClass`
 - `scripts/`
   - operational helpers such as `eks-hop.sh` for one-minor-version EKS upgrades with add-on and nodegroup checks
+
+Operational note:
+- The AWS dev cluster is now intended to be reproducible enough that it can be intentionally scaled down or torn down between active work periods to control cost, then brought back through the normal Terraform + ArgoCD flow.
