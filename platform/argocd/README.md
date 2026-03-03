@@ -66,3 +66,4 @@ Current platform app split:
 Note:
 - Phase 2 public entry should ultimately resolve `pulsecart-dev.cloudevopsguru.com` through ALB to `api-gateway`.
 - After the first manual Route 53 bootstrap, `external-dns` is the intended automation path for keeping that record in sync.
+- ArgoCD becomes the normal in-cluster reconciler after bootstrap, but the first ArgoCD installation itself is still a one-time manual bootstrap step in the current model.
