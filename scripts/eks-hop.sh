@@ -64,6 +64,32 @@ wait_for_cluster_active() {
   done
 }
 
+wait_for_cluster_update() {
+  local update_id="$1"
+  while true; do
+    local update_status
+    update_status="$(
+      aws eks describe-update \
+        --region "${REGION}" \
+        --name "${CLUSTER}" \
+        --update-id "${update_id}" \
+        --query 'update.status' \
+        --output text
+    )"
+    local cluster_status
+    cluster_status="$(describe_cluster_status)"
+    local cluster_version
+    cluster_version="$(describe_cluster_version)"
+    echo "control plane update status=${update_status} cluster_status=${cluster_status} version=${cluster_version}"
+    [[ "${update_status}" == "Successful" && "${cluster_version}" == "${TARGET_VERSION}" ]] && break
+    if [[ "${update_status}" == "Failed" || "${update_status}" == "Cancelled" ]]; then
+      echo "control plane upgrade failed"
+      exit 1
+    fi
+    sleep 20
+  done
+}
+
 wait_for_nodegroup_active() {
   while true; do
     local status
@@ -97,6 +123,7 @@ upgrade_control_plane_if_needed() {
       --output text
   )"
   echo "control plane update id=${update_id}"
+  wait_for_cluster_update "${update_id}"
   wait_for_cluster_active
 }
 
