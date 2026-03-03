@@ -156,6 +156,7 @@ upgrade_addon_if_needed() {
       aws eks describe-update \
         --region "${REGION}" \
         --name "${CLUSTER}" \
+        --addon-name "${addon_name}" \
         --update-id "${update_id}" \
         --query 'update.status' \
         --output text
