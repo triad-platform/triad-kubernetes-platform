@@ -110,6 +110,43 @@ addon_target_version() {
     --output text
 }
 
+describe_addon_version() {
+  local addon_name="$1"
+  aws eks describe-addon \
+    --region "${REGION}" \
+    --cluster-name "${CLUSTER}" \
+    --addon-name "${addon_name}" \
+    --query 'addon.addonVersion' \
+    --output text
+}
+
+describe_addon_status() {
+  local addon_name="$1"
+  aws eks describe-addon \
+    --region "${REGION}" \
+    --cluster-name "${CLUSTER}" \
+    --addon-name "${addon_name}" \
+    --query 'addon.status' \
+    --output text
+}
+
+wait_for_addon_active() {
+  local addon_name="$1"
+  while true; do
+    local status
+    status="$(describe_addon_status "${addon_name}")"
+    local version
+    version="$(describe_addon_version "${addon_name}")"
+    echo "addon ${addon_name} status=${status} version=${version}"
+    [[ "${status}" == "ACTIVE" ]] && break
+    if [[ "${status}" == "DEGRADED" || "${status}" == "CREATE_FAILED" || "${status}" == "DELETE_FAILED" || "${status}" == "UPDATE_FAILED" ]]; then
+      echo "addon ${addon_name} is in a failed state: ${status}"
+      exit 1
+    fi
+    sleep 15
+  done
+}
+
 upgrade_addon_if_needed() {
   local addon_name="$1"
   local desired_addon_version
@@ -121,16 +158,18 @@ upgrade_addon_if_needed() {
   fi
 
   local current_addon_version
-  current_addon_version="$(
-    aws eks describe-addon \
-      --region "${REGION}" \
-      --cluster-name "${CLUSTER}" \
-      --addon-name "${addon_name}" \
-      --query 'addon.addonVersion' \
-      --output text
-  )"
+  current_addon_version="$(describe_addon_version "${addon_name}")"
+  local current_addon_status
+  current_addon_status="$(describe_addon_status "${addon_name}")"
 
-  echo "addon ${addon_name} current=${current_addon_version} target=${desired_addon_version}"
+  echo "addon ${addon_name} status=${current_addon_status} current=${current_addon_version} target=${desired_addon_version}"
+
+  if [[ "${current_addon_status}" == "UPDATING" || "${current_addon_status}" == "CREATING" || "${current_addon_status}" == "DELETING" ]]; then
+    echo "addon ${addon_name} is already ${current_addon_status}; waiting for it to become ACTIVE"
+    wait_for_addon_active "${addon_name}"
+    current_addon_version="$(describe_addon_version "${addon_name}")"
+    echo "addon ${addon_name} post-wait current=${current_addon_version} target=${desired_addon_version}"
+  fi
 
   if [[ "${current_addon_version}" == "${desired_addon_version}" ]]; then
     echo "addon ${addon_name} already at target; skipping"
@@ -161,7 +200,7 @@ upgrade_addon_if_needed() {
         --query 'update.status' \
         --output text
     )"
-    echo "addon ${addon_name} status=${status}"
+    echo "addon ${addon_name} update status=${status}"
     [[ "${status}" == "Successful" ]] && break
     if [[ "${status}" == "Failed" || "${status}" == "Cancelled" ]]; then
       echo "addon ${addon_name} upgrade failed"
@@ -169,6 +208,8 @@ upgrade_addon_if_needed() {
     fi
     sleep 15
   done
+
+  wait_for_addon_active "${addon_name}"
 }
 
 upgrade_nodegroup_if_needed() {
