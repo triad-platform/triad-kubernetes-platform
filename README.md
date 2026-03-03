@@ -26,3 +26,5 @@ Current Phase 2 starting points:
   - `external-secrets` can now merge AWS-backed values into those observability secrets for a non-breaking migration
 - `platform/storage/`
   - cluster storage baseline with a default CSI-backed `gp3` `StorageClass`
+- `scripts/`
+  - operational helpers such as `eks-hop.sh` for one-minor-version EKS upgrades with add-on and nodegroup checks
