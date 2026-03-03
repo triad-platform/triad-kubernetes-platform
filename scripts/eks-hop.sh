@@ -105,7 +105,17 @@ wait_for_nodegroup_active() {
 upgrade_control_plane_if_needed() {
   local current_version
   current_version="$(describe_cluster_version)"
+  local current_status
+  current_status="$(describe_cluster_status)"
   echo "current control plane version=${current_version}"
+
+  if [[ "${current_status}" == "UPDATING" ]]; then
+    echo "control plane is already UPDATING; waiting for it to return to ACTIVE"
+    wait_for_cluster_active
+    current_version="$(describe_cluster_version)"
+    current_status="$(describe_cluster_status)"
+    echo "control plane post-wait status=${current_status} version=${current_version}"
+  fi
 
   if [[ "${current_version}" == "${TARGET_VERSION}" ]]; then
     echo "control plane already at ${TARGET_VERSION}; skipping"
