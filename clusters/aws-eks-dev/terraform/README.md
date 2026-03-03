@@ -61,6 +61,7 @@ terraform plan
 7. The external-secrets IAM policy should include the observability secret path if you want Grafana and Alertmanager config to come from Secrets Manager:
    - `triad/dev/observability/*`
 8. Set `alertmanager_sns_topic_arns` when you want Alertmanager to publish directly to SNS through IRSA.
+9. The EKS managed add-ons are configured with `most_recent = true` so Terraform follows the latest compatible AWS build for the declared cluster version instead of downgrading add-ons after manual or scripted version hops.
 
 ## Cost Baseline
 
@@ -85,3 +86,11 @@ all need headroom without hitting per-node pod limits.
 
 If the cluster is already live and you hit scheduler events like `Too many pods`, update the real
 `terraform.tfvars` to the same `3/3/4` values and apply. That is the current expected dev capacity.
+
+## Upgrade Drift Notes
+
+If you upgrade the control plane or add-ons outside Terraform (for example with `scripts/eks-hop.sh`), keep these aligned:
+
+1. Set `kubernetes_version` in the real `terraform.tfvars` to the live cluster target.
+2. Run `terraform plan` after the upgrade.
+3. With `most_recent = true` on managed add-ons, Terraform should converge to the latest compatible build for that Kubernetes version instead of planning a downgrade to an older add-on build.

@@ -15,11 +15,18 @@ module "eks" {
 
   cluster_addons = {
     aws-ebs-csi-driver = {
+      most_recent              = true
       service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
     }
-    coredns    = {}
-    kube-proxy = {}
-    vpc-cni    = {}
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
   }
 
   eks_managed_node_group_defaults = {
