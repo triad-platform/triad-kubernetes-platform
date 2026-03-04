@@ -10,6 +10,7 @@ Terraform root stack for the first Phase 2 EKS cluster.
 4. Creates the IRSA role for the AWS Load Balancer Controller
 5. Creates the IRSA role for external-dns
 6. Creates the IRSA role for external-secrets
+7. Enables the AWS EBS CSI managed add-on with an IRSA role for the CSI controller
 
 ## Inputs
 
@@ -56,12 +57,40 @@ terraform plan
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-dns/serviceaccount.yaml`
 5. You are ready to use the output `external_secrets_role_arn` to keep the manifest aligned:
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/platform/external-secrets/serviceaccount.yaml`
+6. You are ready to use the output `ebs_csi_role_arn` as part of the cluster storage baseline and managed add-on posture.
+7. The external-secrets IAM policy should include the observability secret path if you want Grafana and Alertmanager config to come from Secrets Manager:
+   - `triad/dev/observability/*`
+8. Set `alertmanager_sns_topic_arns` when you want Alertmanager to publish directly to SNS through IRSA.
+9. The EKS managed add-ons are configured with `most_recent = true` so Terraform follows the latest compatible AWS build for the declared cluster version instead of downgrading add-ons after manual or scripted version hops.
 
 ## Cost Baseline
 
 The default node group is intentionally minimal for learning:
 
 1. `t3.medium`
-2. desired size `1`
-3. min size `1`
-4. max size `2`
+2. desired size `3`
+3. min size `3`
+4. max size `4`
+
+This is now the practical floor for the current dev stack because:
+1. core EKS system pods
+2. ArgoCD
+3. ALB controller
+4. cert-manager
+5. external-dns
+6. external-secrets
+7. NATS
+8. PulseCart workloads
+9. observability pods
+all need headroom without hitting per-node pod limits.
+
+If the cluster is already live and you hit scheduler events like `Too many pods`, update the real
+`terraform.tfvars` to the same `3/3/4` values and apply. That is the current expected dev capacity.
+
+## Upgrade Drift Notes
+
+If you upgrade the control plane or add-ons outside Terraform (for example with `scripts/eks-hop.sh`), keep these aligned:
+
+1. Set `kubernetes_version` in the real `terraform.tfvars` to the live cluster target.
+2. Run `terraform plan` after the upgrade.
+3. With `most_recent = true` on managed add-ons, Terraform should converge to the latest compatible build for that Kubernetes version instead of planning a downgrade to an older add-on build.

@@ -42,10 +42,18 @@ jobs:
             return 1
           }
 
+          fetch_async_status() {
+            curl -fsS "${BASE_URL}/v1/dev/async-status"
+          }
+
           if ! wait_for_http "${BASE_URL}/healthz"; then
             echo "timed out waiting for ${BASE_URL}/healthz"
             exit 1
           fi
+
+          before_status="$(fetch_async_status)"
+          before_worker_processed="$(printf '%s' "$before_status" | jq -r '.worker_messages_processed')"
+          before_notifications_accepted="$(printf '%s' "$before_status" | jq -r '.notifications_accepted')"
 
           run_id="$(date +%s)-$$"
           idem_key="cloud-smoke-${run_id}"
@@ -79,5 +87,27 @@ jobs:
             exit 1
           fi
           rm -f "$resp_two"
+
+          async_ok=false
+          for ((i = 1; i <= MAX_ATTEMPTS; i++)); do
+            after_status="$(fetch_async_status)"
+            after_worker_processed="$(printf '%s' "$after_status" | jq -r '.worker_messages_processed')"
+            after_notifications_accepted="$(printf '%s' "$after_status" | jq -r '.notifications_accepted')"
+
+            if (( after_worker_processed > before_worker_processed )) && (( after_notifications_accepted > before_notifications_accepted )); then
+              async_ok=true
+              break
+            fi
+            sleep "$SLEEP_SECONDS"
+          done
+
+          if [[ "$async_ok" != "true" ]]; then
+            echo "async counters did not advance"
+            echo "before worker processed: ${before_worker_processed}"
+            echo "before notifications accepted: ${before_notifications_accepted}"
+            echo "after worker processed: ${after_worker_processed:-unknown}"
+            echo "after notifications accepted: ${after_notifications_accepted:-unknown}"
+            exit 1
+          fi
 
           echo "CLOUD SMOKE PASS"

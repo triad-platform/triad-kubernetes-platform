@@ -2,7 +2,7 @@ cluster:
   name: triad-aws-eks-dev
   environment: dev
   region: us-east-1
-  kubernetesVersion: "1.30"
+  kubernetesVersion: "1.35"
 
 landingZoneInputs:
   vpcId: "vpc-0980661f4e1fb3aa3"

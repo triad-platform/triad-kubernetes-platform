@@ -11,3 +11,4 @@ resources:
   - external-secrets.yaml
   - nats.yaml
   - observability-baseline.yaml
+  - storage-baseline.yaml

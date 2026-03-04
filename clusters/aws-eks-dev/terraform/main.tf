@@ -14,9 +14,19 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
 
   cluster_addons = {
-    coredns    = {}
-    kube-proxy = {}
-    vpc-cni    = {}
+    aws-ebs-csi-driver = {
+      most_recent              = true
+      service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
+    }
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
   }
 
   eks_managed_node_group_defaults = {
@@ -68,6 +78,24 @@ module "external_dns_irsa" {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["kube-system:external-dns"]
+    }
+  }
+
+  tags = var.tags
+}
+
+module "ebs_csi_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.0"
+
+  role_name = "${var.cluster_name}-ebs-csi"
+
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
     }
   }
 
@@ -132,4 +160,63 @@ resource "aws_iam_policy" "external_secrets_access" {
 resource "aws_iam_role_policy_attachment" "external_secrets_access" {
   role       = aws_iam_role.external_secrets.name
   policy_arn = aws_iam_policy.external_secrets_access.arn
+}
+
+data "aws_iam_policy_document" "alertmanager_sns_assume_role" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [module.eks.oidc_provider_arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.eks_oidc_provider_hostpath}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.eks_oidc_provider_hostpath}:sub"
+      values   = ["system:serviceaccount:observability:alertmanager"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "alertmanager_sns_publish" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+    resources = var.alertmanager_sns_topic_arns
+  }
+}
+
+resource "aws_iam_role" "alertmanager_sns" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  name               = "${var.cluster_name}-alertmanager-sns"
+  assume_role_policy = data.aws_iam_policy_document.alertmanager_sns_assume_role[0].json
+  tags               = var.tags
+}
+
+resource "aws_iam_policy" "alertmanager_sns_publish" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  name   = "${var.cluster_name}-alertmanager-sns-publish"
+  policy = data.aws_iam_policy_document.alertmanager_sns_publish[0].json
+  tags   = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "alertmanager_sns_publish" {
+  count = length(var.alertmanager_sns_topic_arns) > 0 ? 1 : 0
+
+  role       = aws_iam_role.alertmanager_sns[0].name
+  policy_arn = aws_iam_policy.alertmanager_sns_publish[0].arn
 }

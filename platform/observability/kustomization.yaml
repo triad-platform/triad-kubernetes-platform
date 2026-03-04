@@ -3,4 +3,21 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - placeholder-configmap.yaml
+  - alertmanager-serviceaccount.yaml
+  - secretstore.yaml
+  - externalsecret-grafana-admin.yaml
+  - externalsecret-alertmanager-config.yaml
+  - alertmanager-pvc.yaml
+  - alertmanager-deployment.yaml
+  - alertmanager-service.yaml
+  - prometheus-configmap.yaml
+  - prometheus-rules-configmap.yaml
+  - prometheus-pvc.yaml
+  - prometheus-deployment.yaml
+  - prometheus-service.yaml
+  - grafana-datasources-configmap.yaml
+  - grafana-dashboard-provider-configmap.yaml
+  - grafana-dashboards-configmap.yaml
+  - grafana-pvc.yaml
+  - grafana-deployment.yaml
+  - grafana-service.yaml

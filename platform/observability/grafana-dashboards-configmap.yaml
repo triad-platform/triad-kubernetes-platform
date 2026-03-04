@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: observability
+data:
+  pulsecart-phase1-overview.json: |
+    {
+      "title": "PulseCart Phase 1 Overview",
+      "uid": "pulsecart-phase1",
+      "schemaVersion": 39,
+      "version": 1,
+      "editable": true,
+      "style": "dark",
+      "refresh": "10s",
+      "time": {
+        "from": "now-30m",
+        "to": "now"
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Gateway Requests (total rate)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "rate(triad_api_gateway_http_requests_total[5m])",
+              "legendFormat": "gateway req/s",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Gateway 5xx Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "targets": [
+            {
+              "expr": "rate(triad_api_gateway_http_response_status_500_total[5m])",
+              "legendFormat": "5xx req/s",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Orders Success vs Duplicates",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "rate(triad_orders_create_order_success_total[5m])",
+              "legendFormat": "success",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(triad_orders_create_order_duplicates_total[5m])",
+              "legendFormat": "duplicates",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Orders Persistence + Publish Errors",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "targets": [
+            {
+              "expr": "rate(triad_orders_create_order_persistence_errors_total[5m])",
+              "legendFormat": "persistence errors",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(triad_orders_create_order_publish_errors_total[5m])",
+              "legendFormat": "publish errors",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Worker Processed vs Duplicate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+          "targets": [
+            {
+              "expr": "rate(triad_worker_messages_processed_total[5m])",
+              "legendFormat": "processed",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(triad_worker_messages_duplicates_total[5m])",
+              "legendFormat": "duplicate",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Worker Error Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+          "targets": [
+            {
+              "expr": "rate(triad_worker_messages_errors_total[5m])",
+              "legendFormat": "worker errors",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(triad_worker_notifier_errors_total[5m])",
+              "legendFormat": "notifier errors",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "Orders Create Latency (avg seconds)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+          "targets": [
+            {
+              "expr": "triad_orders_create_order_duration_seconds_sum / clamp_min(triad_orders_create_order_duration_seconds_count, 1)",
+              "legendFormat": "orders avg s",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "title": "Worker Process Latency (avg seconds)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+          "targets": [
+            {
+              "expr": "triad_worker_process_orders_created_duration_seconds_sum / clamp_min(triad_worker_process_orders_created_duration_seconds_count, 1)",
+              "legendFormat": "worker avg s",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }

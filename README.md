@@ -1,6 +1,6 @@
 # triad-kubernetes-platform
 
-GitOps-managed Kubernetes platform layer (EKS + AKS).
+GitOps-managed Kubernetes platform layer (EKS + AKS + GKE).
 - cluster bootstrapping references
 - platform add-ons (ArgoCD, ingress, cert-manager, policies, observability)
 - app-of-apps patterns
@@ -17,3 +17,20 @@ Current Phase 2 starting points:
 - `workloads/pulsecart/dev/`
   - dev GitOps overlay that pins the live workload image refs ArgoCD reconciles
   - the platform repo now also owns the automatic cloud smoke workflow for deploy-state changes
+  - that smoke now validates both the public request contract and the async worker/notification completion path
+- `platform/observability/`
+  - real in-cluster Prometheus + Grafana dev baseline managed by ArgoCD
+  - starter dashboard and alert rules are deployed here, not just documented
+  - persistent PVC-backed storage and a baseline Alertmanager are now part of the dev stack
+  - Grafana admin and Alertmanager receiver config now use Kubernetes secrets instead of inline defaults
+  - `external-secrets` can now merge AWS-backed values into those observability secrets for a non-breaking migration
+- `platform/storage/`
+  - cluster storage baseline with a default CSI-backed `gp3` `StorageClass`
+- `scripts/`
+  - operational helpers such as `eks-hop.sh` for one-minor-version EKS upgrades with add-on and nodegroup checks
+- `docs/runbooks/`
+  - operational runbooks, including the current AWS dev teardown/rebuild path
+
+Operational note:
+- The AWS dev cluster is now intended to be reproducible enough that it can be intentionally scaled down or torn down between active work periods to control cost, then brought back through the normal Terraform + ArgoCD flow.
+- That makes it a strong dev reference baseline, but not a production-grade platform yet.

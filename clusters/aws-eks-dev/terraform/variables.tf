@@ -13,7 +13,7 @@ variable "cluster_name" {
 variable "kubernetes_version" {
   description = "Kubernetes version for the EKS control plane."
   type        = string
-  default     = "1.30"
+  default     = "1.35"
 }
 
 variable "vpc_id" {
@@ -40,19 +40,19 @@ variable "node_instance_types" {
 variable "node_desired_size" {
   description = "Desired node group size."
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "node_min_size" {
   description = "Minimum node group size."
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "node_max_size" {
   description = "Maximum node group size."
   type        = number
-  default     = 2
+  default     = 4
 }
 
 variable "tags" {
@@ -76,5 +76,12 @@ variable "external_secrets_secret_arns" {
   type        = list(string)
   default = [
     "arn:aws:secretsmanager:us-east-1:971146591534:secret:rds!db-b84b7356-92eb-43fd-bf93-df2842556b62-IxwMhw",
+    "arn:aws:secretsmanager:us-east-1:971146591534:secret:triad/dev/observability/*",
   ]
+}
+
+variable "alertmanager_sns_topic_arns" {
+  description = "SNS topic ARNs Alertmanager is allowed to publish to via IRSA."
+  type        = list(string)
+  default     = []
 }
