@@ -185,44 +185,47 @@ kubectl get pods -A
 
 At this point, the cluster exists, but the platform and apps are not yet restored.
 
-### Step 4: Install Or Restore ArgoCD (Manual Bootstrap)
+### Step 4: Bootstrap ArgoCD And Root Apps (Scripted Default)
 
-This is still a one-time manual bootstrap step in the current model.
+Use the helper script as the default bootstrap path:
 
-Install ArgoCD:
+```bash
+/Users/lseino/triad-platform/triad-kubernetes-platform/scripts/bootstrap-argocd.sh
+```
+
+What this script does:
+
+1. ensures namespace `argocd` exists
+2. installs ArgoCD from the upstream stable manifest using server-side apply
+3. waits for ArgoCD pods to become ready
+4. verifies `argocd-cm` exists
+5. applies `/platform/argocd/root-applications.yaml`
+
+Optional environment overrides:
+
+1. `ARGOCD_NAMESPACE`
+2. `ARGOCD_INSTALL_URL`
+3. `ROOT_APPS_FILE`
+4. `TIMEOUT_SECONDS`
+
+Manual fallback (only if script cannot be used):
 
 ```bash
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -n argocd --server-side --force-conflicts \
   -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/platform/argocd/root-applications.yaml
 ```
 
-Wait for it:
-
-```bash
-kubectl get pods -n argocd -w
-```
-
-Then restore operator access:
+Then restore operator access if needed:
 
 ```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
-```
-
-If needed, get the initial admin password:
-
-```bash
 kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath='{.data.password}' | base64 --decode; echo
 ```
 
-### Step 5: Apply The Argo Root Applications
-
-Bootstrap the app-of-apps root:
-
-```bash
-kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/platform/argocd/root-applications.yaml
-```
+### Step 5: Verify Argo Root Applications
 
 Verify Argo sees the applications:
 
