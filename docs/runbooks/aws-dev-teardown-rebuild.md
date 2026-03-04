@@ -265,6 +265,50 @@ Specific health checks:
 2. `external-secrets` should be healthy
 3. `gp3` storage class should exist
 4. observability PVCs should be `Bound`
+5. required `external-secrets` CRDs should exist:
+
+```bash
+kubectl get crd externalsecrets.external-secrets.io secretstores.external-secrets.io clustersecretstores.external-secrets.io
+```
+
+If `external-secrets` is healthy but workloads stay `OutOfSync/Missing`, run first-principles checks:
+
+```bash
+argocd app get external-secrets
+argocd app get observability-baseline
+argocd app get pulsecart-workloads
+kubectl get ns observability pulsecart
+```
+
+Interpretation:
+
+1. If `observability-baseline` and `pulsecart-workloads` show `OutOfSync` + `Missing`
+2. and `observability` / `pulsecart` namespaces are not created
+3. and Argo reports missing `SecretStore` / `ExternalSecret` kinds
+
+then the root cause is missing CRDs in the destination cluster (most commonly `secretstores.external-secrets.io` and `clustersecretstores.external-secrets.io`).
+
+Recovery (cluster-side, no app manifest changes required):
+
+```bash
+helm repo add external-secrets https://charts.external-secrets.io
+helm repo update
+
+helm template external-secrets external-secrets/external-secrets \
+  --version 0.20.4 \
+  --namespace kube-system \
+  --set installCRDs=true > /tmp/external-secrets-rendered.yaml
+
+kubectl apply --server-side --force-conflicts -f /tmp/external-secrets-rendered.yaml
+
+kubectl get crd externalsecrets.external-secrets.io secretstores.external-secrets.io clustersecretstores.external-secrets.io
+
+argocd app sync external-secrets-prereqs --prune --force
+argocd app sync external-secrets --prune --force
+argocd app sync observability-baseline --prune --force
+argocd app sync pulsecart-workloads --prune --force
+argocd app list
+```
 
 ### Step 7: Let Workloads Converge
 
