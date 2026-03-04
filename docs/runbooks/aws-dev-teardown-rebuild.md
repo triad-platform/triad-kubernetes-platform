@@ -216,6 +216,30 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath='{.data.password}' | base64 --decode; echo
 ```
 
+Preflight before using `argocd app` commands:
+
+```bash
+kubectl config current-context
+kubectl get ns argocd
+kubectl get cm argocd-cm -n argocd
+kubectl get pods -n argocd
+```
+
+If CLI login is needed, run:
+
+```bash
+argocd login localhost:8080 --username admin \
+  --password "$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode)" \
+  --insecure
+```
+
+If you get `configmap "argocd-cm" not found`:
+
+1. You are likely on the wrong Kubernetes context, or ArgoCD install has not completed.
+2. Re-run Step 3 (`aws eks update-kubeconfig ...`) and verify `kubectl config current-context`.
+3. Re-run Step 4 install command and wait until ArgoCD pods are `Running`.
+4. Confirm `kubectl get cm argocd-cm -n argocd` succeeds before running any `argocd app` command.
+
 ### Step 5: Apply The Argo Root Applications
 
 Bootstrap the app-of-apps root:
@@ -265,6 +289,11 @@ Specific health checks:
 2. `external-secrets` should be healthy
 3. `gp3` storage class should exist
 4. observability PVCs should be `Bound`
+5. `ExternalSecret` and `SecretStore` CRDs should exist:
+
+```bash
+kubectl get crd externalsecrets.external-secrets.io secretstores.external-secrets.io
+```
 
 ### Step 7: Let Workloads Converge
 
@@ -291,6 +320,62 @@ Expected:
 1. `pulsecart-workloads` is `Synced` and `Healthy`
 2. all four workloads are `Running`
 3. ingress has an address
+
+## Troubleshooting: `OutOfSync / Missing` For Child Argo Apps
+
+Symptom seen after rebuild:
+
+1. `observability-baseline` shows `OutOfSync` + `Missing`
+2. `pulsecart-workloads` shows `OutOfSync` + `Missing`
+
+In this state, Argo is usually missing the child `Application` objects in-cluster even though they exist in git.
+
+### Recovery Path
+
+1. Hard refresh and sync the two root apps first:
+
+```bash
+kubectl annotate app triad-platform-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl annotate app triad-workload-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
+
+argocd app sync triad-platform-apps --prune
+argocd app sync triad-workload-apps --prune
+```
+
+2. Verify root source path/revision are still correct:
+
+```bash
+kubectl get app triad-platform-apps -n argocd -o jsonpath='{.spec.source.repoURL}{"\n"}{.spec.source.targetRevision}{"\n"}{.spec.source.path}{"\n"}'
+kubectl get app triad-workload-apps -n argocd -o jsonpath='{.spec.source.repoURL}{"\n"}{.spec.source.targetRevision}{"\n"}{.spec.source.path}{"\n"}'
+```
+
+Expected path values:
+
+1. `apps/platform`
+2. `apps/workloads`
+
+3. If the child apps are still `Missing`, re-apply their `Application` manifests directly:
+
+```bash
+kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/apps/platform/observability-baseline.yaml
+kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/apps/workloads/pulsecart-workloads.yaml
+```
+
+4. Sync child apps and verify:
+
+```bash
+argocd app sync observability-baseline --prune
+argocd app sync pulsecart-workloads --prune
+
+argocd app get observability-baseline
+argocd app get pulsecart-workloads
+kubectl get applications -n argocd
+```
+
+Expected final state:
+
+1. both apps become `Synced`
+2. health moves to `Healthy` after dependent resources converge
 
 ### Step 8: Verify Public Path, Smoke, And Observability
 
