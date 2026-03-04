@@ -98,94 +98,259 @@ That gives meaningful cost reduction while keeping the rebuild path straightforw
 
 ## Rebuild Order
 
-### Step 1: Backend And Landing Zone
+This section assumes the current preferred cost-saving boundary:
 
-1. Ensure the Terraform backend exists:
-   - `triad-landing-zones/bootstrap/aws-tf-backend`
-2. Apply or re-apply:
-   - `triad-landing-zones/envs/dev`
+1. `triad-landing-zones` stays intact
+2. only the EKS/platform layer was destroyed
 
-This restores:
+If the landing zone is still present, you do **not** start by re-applying it again. You begin at the EKS layer.
+
+### Step 1: Confirm The Foundation Is Still Intact
+
+These are expected to remain in place:
 
 1. VPC and subnets
-2. ECR
-3. GitHub OIDC for CI
-4. RDS
-5. ElastiCache
-6. ACM
-7. SNS topic and email subscription
+2. ECR repositories
+3. RDS
+4. ElastiCache
+5. ACM certificate
+6. Route 53 hosted zone and app record
+7. SNS topic and confirmed email subscription
+8. Secrets Manager values for:
+   - database
+   - Grafana admin
+   - Alertmanager config
 
-### Step 2: EKS Platform Layer
+This check is mostly administrative. If those are known-good and the landing-zone stack was not destroyed, continue directly to the EKS layer.
 
-1. Apply:
-   - `triad-kubernetes-platform/clusters/aws-eks-dev/terraform`
-2. Confirm:
-   - cluster exists
-   - node group exists
-   - add-ons are healthy
+### Step 2: Re-Apply The EKS Platform Layer
 
-If Kubernetes version drift is involved, use:
+Apply the EKS layer first:
 
 ```bash
-/Users/lseino/triad-platform/triad-kubernetes-platform/scripts/eks-hop.sh <target-version>
+cd /Users/lseino/triad-platform/triad-kubernetes-platform/clusters/aws-eks-dev/terraform
+terraform plan
+terraform apply
 ```
 
-### Step 3: Cluster Access
+This should recreate:
 
-1. Refresh kubeconfig:
+1. EKS cluster
+2. managed node group
+3. EKS managed add-ons
+4. IRSA roles from this repo
+
+After apply, verify:
+
+```bash
+aws eks describe-cluster \
+  --region us-east-1 \
+  --name triad-aws-eks-dev \
+  --query 'cluster.{version:version,status:status}' \
+  --output json
+
+aws eks describe-nodegroup \
+  --region us-east-1 \
+  --cluster-name triad-aws-eks-dev \
+  --nodegroup-name default-20260228232254827600000012 \
+  --query 'nodegroup.{version:version,status:status,scaling:scalingConfig}' \
+  --output json
+```
+
+Current expected dev baseline:
+
+1. Kubernetes version `1.35`
+2. node floor `3/3/4`
+
+If version drift is involved, use the helper:
+
+```bash
+/Users/lseino/triad-platform/triad-kubernetes-platform/scripts/eks-hop.sh 1.35
+```
+
+### Step 3: Restore Cluster Access
+
+Refresh kubeconfig:
 
 ```bash
 aws eks update-kubeconfig --region us-east-1 --name triad-aws-eks-dev
 ```
 
-2. Confirm access:
+Then verify the cluster is reachable:
 
 ```bash
 kubectl get nodes
+kubectl get pods -A
 ```
 
-### Step 4: ArgoCD Bootstrap
+At this point, the cluster exists, but the platform and apps are not yet restored.
+
+### Step 4: Install Or Restore ArgoCD (Manual Bootstrap)
 
 This is still a one-time manual bootstrap step in the current model.
 
-1. Install ArgoCD into the cluster
-2. Port-forward and log in
-3. Apply:
-   - `triad-kubernetes-platform/platform/argocd/root-applications.yaml`
+Install ArgoCD:
 
-After that, Argo should own:
+```bash
+kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -n argocd --server-side --force-conflicts \
+  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
 
-1. platform add-ons
-2. workload reconciliation
+Wait for it:
 
-### Step 5: Secrets And Controllers
+```bash
+kubectl get pods -n argocd -w
+```
 
-The following must already exist and be valid:
+Then restore operator access:
 
-1. AWS Secrets Manager values for:
-   - database
-   - Grafana admin
-   - Alertmanager config
-2. IRSA roles must already be created by Terraform
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
 
-Then allow Argo + `external-secrets` to converge.
+If needed, get the initial admin password:
 
-### Step 6: Validation
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 --decode; echo
+```
 
-Run these in order:
+### Step 5: Apply The Argo Root Applications
 
-1. `argocd app list`
-2. `kubectl get pods -A`
-3. `kubectl get pvc -n observability`
-4. public health check
-5. required cloud smoke
+Bootstrap the app-of-apps root:
 
-The rebuild is only considered complete when:
+```bash
+kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/platform/argocd/root-applications.yaml
+```
 
-1. Argo is healthy
-2. workloads are healthy
-3. observability is healthy
-4. async cloud smoke passes
+Verify Argo sees the applications:
+
+```bash
+kubectl get applications -n argocd
+argocd app list
+```
+
+What should happen next:
+
+1. `triad-platform-apps` and `triad-workload-apps` appear
+2. Argo begins reconciling:
+   - platform add-ons
+   - PulseCart workloads
+
+### Step 6: Let Platform Add-Ons Converge
+
+These should come back through Argo, not manual `kubectl apply`:
+
+1. AWS Load Balancer Controller
+2. cert-manager
+3. external-dns
+4. external-secrets
+5. storage baseline
+6. observability baseline
+7. NATS
+
+Check:
+
+```bash
+argocd app list
+kubectl get pods -A
+kubectl get pvc -n observability
+kubectl get storageclass
+```
+
+Specific health checks:
+
+1. `external-dns` should be healthy
+2. `external-secrets` should be healthy
+3. `gp3` storage class should exist
+4. observability PVCs should be `Bound`
+
+### Step 7: Let Workloads Converge
+
+The workload app should restore:
+
+1. `api-gateway`
+2. `orders`
+3. `worker`
+4. `notifications`
+5. `SecretStore`
+6. `ExternalSecret`
+7. `Ingress`
+
+Check:
+
+```bash
+argocd app get pulsecart-workloads
+kubectl get pods -n pulsecart
+kubectl get ingress -n pulsecart
+```
+
+Expected:
+
+1. `pulsecart-workloads` is `Synced` and `Healthy`
+2. all four workloads are `Running`
+3. ingress has an address
+
+### Step 8: Verify Public Path, Smoke, And Observability
+
+Run the minimum operator validation:
+
+```bash
+curl -i https://pulsecart-dev.cloudevopsguru.com/healthz
+```
+
+Then confirm the normal pipeline validation path is still valid:
+
+1. `triad-kubernetes-platform / E2E Cloud Smoke` can be run manually if needed
+2. a normal app change should still trigger:
+   - build
+   - GitOps overlay promotion
+   - Argo reconciliation
+   - required async cloud smoke
+
+For direct cluster validation:
+
+```bash
+kubectl get pods -n observability
+kubectl logs -n observability deployment/alertmanager --tail=50
+kubectl logs -n observability deployment/prometheus --tail=50
+```
+
+The rebuild is only considered complete when all are true:
+
+1. Argo apps are healthy
+2. platform add-ons are healthy
+3. workloads are healthy
+4. public health endpoint responds
+5. observability is healthy
+6. async cloud smoke passes
+
+## What Is Automated Versus Manual Today
+
+### Automated After Bootstrap
+
+Once the cluster exists and Argo is installed:
+
+1. platform add-ons reconcile from git
+2. workload manifests reconcile from git
+3. `external-dns` maintains the public app record
+4. `external-secrets` restores runtime secrets into the cluster
+5. CI promotes live workload images through the GitOps overlay
+6. Argo reconciles those workload image changes
+7. required cloud smoke validates the deployed path
+
+### Still Manual By Design
+
+These are the current operator steps that are **not** yet fully automated:
+
+1. initial ArgoCD installation
+2. operator login / port-forward for ArgoCD
+3. initial GitHub secret setup
+4. SNS email subscription confirmation
+5. explicit Terraform apply and destroy operations
+
+These are the exact gaps to smooth further before calling the process zero-touch.
 
 ## Remaining Manual Steps (Still Expected)
 
