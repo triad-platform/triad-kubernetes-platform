@@ -374,9 +374,9 @@ Examples of intentionally non-production aspects:
 4. no fully automated org-wide credential brokering yet
 5. no true high-availability data-plane posture inside the cluster
 
-## Exit Condition Before Azure
+## Exit Condition Before Additional Clouds
 
-AWS is considered "ready enough" for Azure parity when:
+AWS is considered "ready enough" for Azure parity first, and then GCP parity after Azure, when:
 
 1. this runbook can be followed without surprise recovery work
 2. the environment can be parked and rebuilt predictably
