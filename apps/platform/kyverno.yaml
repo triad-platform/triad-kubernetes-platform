@@ -13,6 +13,8 @@ spec:
     targetRevision: "3.5.2"
     helm:
       values: |
+        webhooksCleanup:
+          enabled: false
         admissionController:
           replicas: 1
   destination:
