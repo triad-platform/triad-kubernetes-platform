@@ -252,6 +252,8 @@ These should come back through Argo, not manual `kubectl apply`:
 5. storage baseline
 6. observability baseline
 7. NATS
+8. Kyverno
+9. admission policy baseline
 
 Check:
 
@@ -308,10 +310,27 @@ kubectl get crd externalsecrets.external-secrets.io secretstores.external-secret
 
 argocd app sync external-secrets-prereqs --prune --force
 argocd app sync external-secrets --prune --force
+argocd app sync kyverno --prune --force
+argocd app sync admission-policy-baseline --prune --force
 argocd app sync observability-baseline --prune --force
 argocd app sync pulsecart-workloads --prune --force
 argocd app list
 ```
+
+Admission enforcement verification:
+
+```bash
+kubectl get pods -n kyverno
+kubectl get clusterpolicy pulsecart-supply-chain-guardrails
+
+kubectl apply -f /Users/lseino/triad-platform/triad-ci-security/policy/admission/tests/pod-deny-unapproved-registry.yaml
+kubectl apply -f /Users/lseino/triad-platform/triad-ci-security/policy/admission/tests/pod-deny-missing-labels.yaml
+```
+
+Expected:
+
+1. both deny test applies are rejected by admission webhook
+2. rejection message references policy rule violations
 
 ### Step 7: Let Workloads Converge
 

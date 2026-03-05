@@ -11,7 +11,7 @@ Current Phase 2 starting points:
 - `clusters/aws-eks-dev/`
   - dev cluster input contract and first EKS Terraform root
 - `platform/`
-  - ALB controller + external-dns + external-secrets IRSA contracts and first in-cluster NATS manifests
+  - ALB controller + external-dns + external-secrets IRSA contracts, in-cluster NATS, and admission enforcement baseline (Kyverno + policy app)
 - `apps/platform/` and `apps/workloads/`
   - first ArgoCD application split with Helm + Kustomize sources
 - `workloads/pulsecart/dev/`
