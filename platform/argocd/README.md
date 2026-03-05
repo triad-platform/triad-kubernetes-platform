@@ -44,6 +44,8 @@ Current bootstrap starter:
   - contains the initial Application objects for:
     - `apps/platform`
     - `apps/workloads`
+- `/Users/lseino/triad-platform/triad-kubernetes-platform/scripts/bootstrap-argocd.sh`
+  - scripted bootstrap path that installs ArgoCD, waits for readiness, verifies `argocd-cm`, and applies root applications
 
 Current platform app split:
 
@@ -66,4 +68,5 @@ Current platform app split:
 Note:
 - Phase 2 public entry should ultimately resolve `pulsecart-dev.cloudevopsguru.com` through ALB to `api-gateway`.
 - After the first manual Route 53 bootstrap, `external-dns` is the intended automation path for keeping that record in sync.
-- ArgoCD becomes the normal in-cluster reconciler after bootstrap, but the first ArgoCD installation itself is still a one-time manual bootstrap step in the current model.
+- ArgoCD becomes the normal in-cluster reconciler after bootstrap.
+- The preferred bootstrap path is now scripted; manual kubectl install commands are fallback only.
