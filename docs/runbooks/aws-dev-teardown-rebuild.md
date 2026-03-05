@@ -25,6 +25,9 @@ Before teardown or rebuild:
    - ECR
    - EKS
    - Secrets Manager
+5. `kubectl` access to the cluster is the primary control path.
+   - Do not assume `argocd` CLI RBAC is available.
+   - Use `kubectl get/annotate/describe app -n argocd` for reconciliation and diagnostics.
 
 ## What Can Be Safely Parked
 
@@ -231,7 +234,6 @@ Verify Argo sees the applications:
 
 ```bash
 kubectl get applications -n argocd
-argocd app list
 ```
 
 What should happen next:
@@ -240,6 +242,14 @@ What should happen next:
 2. Argo begins reconciling:
    - platform add-ons
    - PulseCart workloads
+
+If root apps do not reconcile to expected child apps, force hard refresh:
+
+```bash
+kubectl annotate app triad-platform-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl annotate app triad-workload-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl get applications -n argocd
+```
 
 ### Step 6: Let Platform Add-Ons Converge
 
@@ -258,10 +268,10 @@ These should come back through Argo, not manual `kubectl apply`:
 Check:
 
 ```bash
-argocd app list
 kubectl get pods -A
 kubectl get pvc -n observability
 kubectl get storageclass
+kubectl get applications -n argocd
 ```
 
 Specific health checks:
@@ -279,9 +289,9 @@ kubectl get crd externalsecrets.external-secrets.io secretstores.external-secret
 If `external-secrets` is healthy but workloads stay `OutOfSync/Missing`, run first-principles checks:
 
 ```bash
-argocd app get external-secrets
-argocd app get observability-baseline
-argocd app get pulsecart-workloads
+kubectl get app external-secrets -n argocd
+kubectl get app observability-baseline -n argocd
+kubectl get app pulsecart-workloads -n argocd
 kubectl get ns observability pulsecart
 ```
 
@@ -308,20 +318,18 @@ kubectl apply --server-side --force-conflicts -f /tmp/external-secrets-rendered.
 
 kubectl get crd externalsecrets.external-secrets.io secretstores.external-secrets.io clustersecretstores.external-secrets.io
 
-argocd app sync external-secrets-prereqs --prune --force
-argocd app sync external-secrets --prune --force
-argocd app sync kyverno --prune --force
-argocd app sync admission-policy-baseline --prune --force
-argocd app sync observability-baseline --prune --force
-argocd app sync pulsecart-workloads --prune --force
-argocd app list
+kubectl annotate app external-secrets-prereqs -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl annotate app external-secrets -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl annotate app observability-baseline -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl annotate app pulsecart-workloads -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl get applications -n argocd
 ```
 
 Admission enforcement verification:
 
 ```bash
 kubectl get pods -n kyverno
-kubectl get clusterpolicy pulsecart-supply-chain-guardrails
+kubectl get clusterpolicies.kyverno.io
 
 kubectl apply -f /Users/lseino/triad-platform/triad-ci-security/policy/admission/tests/pod-deny-unapproved-registry.yaml
 kubectl apply -f /Users/lseino/triad-platform/triad-ci-security/policy/admission/tests/pod-deny-missing-labels.yaml
@@ -331,6 +339,23 @@ Expected:
 
 1. both deny test applies are rejected by admission webhook
 2. rejection message references policy rule violations
+
+Kyverno-specific recovery branch (if `kyverno` shows `OutOfSync/Missing`):
+
+```bash
+kubectl create namespace kyverno --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/apps/platform/kyverno.yaml
+kubectl apply -f /Users/lseino/triad-platform/triad-kubernetes-platform/apps/platform/admission-policy-baseline.yaml
+kubectl annotate app kyverno -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl annotate app admission-policy-baseline -n argocd argocd.argoproj.io/refresh=hard --overwrite
+kubectl get applications -n argocd
+```
+
+If namespace deletion hangs during cleanup, clear finalizers:
+
+```bash
+kubectl get ns kyverno -o json | jq 'del(.spec.finalizers)' | kubectl replace --raw /api/v1/namespaces/kyverno/finalize -f -
+```
 
 ### Step 7: Let Workloads Converge
 
@@ -347,7 +372,7 @@ The workload app should restore:
 Check:
 
 ```bash
-argocd app get pulsecart-workloads
+kubectl get applications -n argocd
 kubectl get pods -n pulsecart
 kubectl get ingress -n pulsecart
 ```
