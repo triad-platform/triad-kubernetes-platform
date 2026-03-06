@@ -1,0 +1,20 @@
+project_id = "triad-platform-dev"
+region     = "us-east1"
+
+cluster_name       = "triad-gcp-dev-gke"
+kubernetes_version = "1.31"
+
+network_name                = "triad-gcp-dev-vpc"
+subnetwork_name             = "triad-gke-dev-subnet"
+pods_secondary_range_name   = "pods"
+services_secondary_range_name = "services"
+
+node_machine_type = "e2-standard-4"
+node_min_count    = 3
+node_max_count    = 4
+
+labels = {
+  environment = "dev"
+  stage       = "phase5"
+  managed_by  = "terraform"
+}
