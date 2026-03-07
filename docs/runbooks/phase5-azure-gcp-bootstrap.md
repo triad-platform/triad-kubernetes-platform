@@ -150,5 +150,7 @@ kubectl config current-context
 
 1. Foundation mapping:
    - `/Users/lseino/triad-platform/triad-landing-zones/docs/architecture/001-aws-azure-gcp-foundation-mapping.md`
-2. Day-2 operations translation:
+2. Terraform backend parity:
+   - `/Users/lseino/triad-platform/triad-landing-zones/docs/architecture/002-terraform-backend-parity-aws-azure-gcp.md`
+3. Day-2 operations translation:
    - `/Users/lseino/triad-platform/triad-kubernetes-platform/docs/runbooks/multi-cloud-day2-translation-cheatsheet.md`
