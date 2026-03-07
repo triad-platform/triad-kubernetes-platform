@@ -25,8 +25,9 @@ This stack consumes values from `triad-landing-zones/azure/envs/dev` outputs:
 
 ```bash
 cd /Users/lseino/triad-platform/triad-kubernetes-platform/clusters/azure-aks-dev/terraform
+cp backend.hcl.example backend.hcl
 cp terraform.tfvars.example terraform.tfvars
-terraform init
+terraform init -backend-config=backend.hcl
 terraform plan
 ```
 

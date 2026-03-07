@@ -17,13 +17,49 @@ This runbook is the operator path to stand up Azure and GCP baselines after AWS 
 3. Google Cloud SDK authenticated (`gcloud auth application-default login`)
 4. Cloud-side permissions to create networking, managed Kubernetes, registry, and identity resources
 
+## Step 0: Bootstrap Remote State Backends (One-Time)
+
+### 0A) Azure backend bootstrap
+
+```bash
+cd /Users/lseino/triad-platform/triad-landing-zones/bootstrap/azure-tf-backend
+cp terraform.tfvars.example terraform.tfvars
+# set subscription_id and tenant_id
+terraform init
+terraform plan
+terraform apply
+```
+
+Capture:
+
+1. `resource_group_name`
+2. `storage_account_name`
+3. `container_name`
+
+### 0B) GCP backend bootstrap
+
+```bash
+cd /Users/lseino/triad-platform/triad-landing-zones/bootstrap/gcp-tf-backend
+cp terraform.tfvars.example terraform.tfvars
+# set project_id and a globally unique state_bucket_name
+terraform init
+terraform plan
+terraform apply
+```
+
+Capture:
+
+1. `state_bucket_name`
+
 ## Step 1: Azure Landing Zone
 
 ```bash
 cd /Users/lseino/triad-platform/triad-landing-zones/azure/envs/dev
+cp backend.hcl.example backend.hcl
+# set storage_account_name from Step 0A output
 cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars with your real subscription/tenant and any CIDR overrides
-terraform init
+terraform init -backend-config=backend.hcl
 terraform plan
 terraform apply
 ```
@@ -41,9 +77,11 @@ Copy these output values for Step 2:
 
 ```bash
 cd /Users/lseino/triad-platform/triad-kubernetes-platform/clusters/azure-aks-dev/terraform
+cp backend.hcl.example backend.hcl
+# set storage_account_name from Step 0A output
 cp terraform.tfvars.example terraform.tfvars
 # paste values from Azure landing-zone outputs
-terraform init
+terraform init -backend-config=backend.hcl
 terraform plan
 terraform apply
 ```
@@ -62,9 +100,11 @@ kubectl config current-context
 
 ```bash
 cd /Users/lseino/triad-platform/triad-landing-zones/gcp/envs/dev
+cp backend.hcl.example backend.hcl
+# set bucket from Step 0B output
 cp terraform.tfvars.example terraform.tfvars
 # set project_id and region, adjust CIDRs only if needed
-terraform init
+terraform init -backend-config=backend.hcl
 terraform plan
 terraform apply
 ```
@@ -82,9 +122,11 @@ Copy these output values for Step 4:
 
 ```bash
 cd /Users/lseino/triad-platform/triad-kubernetes-platform/clusters/gcp-gke-dev/terraform
+cp backend.hcl.example backend.hcl
+# set bucket from Step 0B output
 cp terraform.tfvars.example terraform.tfvars
 # paste values from GCP landing-zone outputs
-terraform init
+terraform init -backend-config=backend.hcl
 terraform plan
 terraform apply
 ```
