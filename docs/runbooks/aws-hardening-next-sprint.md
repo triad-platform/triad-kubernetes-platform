@@ -17,6 +17,7 @@ The goal is not to expand cloud surface area further right now. The goal is to m
 2. Remove stale placeholders or contradictory examples where the real AWS account, region, ECR, and IRSA assumptions are already known.
 3. Re-run signed-image and approved-registry deny/allow validation against the live EKS cluster.
 4. Capture fresh evidence for build, SBOM, scan, sign, attest, and admission outcomes.
+5. Keep the GitOps image promotion path resilient to normal branch movement so deployment churn does not create human merge work.
 
 ## Workstream 2: Runtime Secret And Config Cleanup
 
@@ -29,12 +30,21 @@ The goal is not to expand cloud surface area further right now. The goal is to m
 1. Reconcile alert rules, dashboard expectations, and runbooks with the current AWS observability stack.
 2. Re-run at least one failure drill that exercises async order flow visibility and documented recovery.
 3. Tighten teardown/rebuild guidance where stale-lock, CRD ordering, or Argo root sync issues were previously observed.
+4. Turn the `external-secrets` CRD bootstrap recovery into a deterministic GitOps prerequisite instead of a manual post-bootstrap step.
 
 ## Workstream 4: Evidence And Narrative
 
 1. Update workspace and repo READMEs when the AWS hardening state changes.
 2. Add or refresh at least one `triad-portfolio` memo or drill artifact with concrete findings.
 3. Record what must remain AWS-specific versus what is ready to port back to AKS and GKE.
+
+## Current Notes
+
+The March 14, 2026 rebuild established:
+
+1. EKS plus ArgoCD plus workloads can be restored after intentional cost teardown.
+2. The remaining bootstrap weakness is CRD readiness on an empty cluster, not normal Argo reconciliation on an already-shaped cluster.
+3. Kyverno enforcement is now acting as intended and should drive manifest quality upward rather than be bypassed.
 
 ## Exit Signal
 
