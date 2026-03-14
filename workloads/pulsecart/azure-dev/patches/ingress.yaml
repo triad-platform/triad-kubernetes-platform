@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pulsecart
+  namespace: pulsecart
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: null
+    alb.ingress.kubernetes.io/listen-ports: null
+    alb.ingress.kubernetes.io/scheme: null
+    alb.ingress.kubernetes.io/ssl-redirect: null
+    alb.ingress.kubernetes.io/subnets: null
+    alb.ingress.kubernetes.io/target-type: null
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/hostname: pulsecart-azure-dev.cloudevopsguru.com
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: pulsecart-azure-dev.cloudevopsguru.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080

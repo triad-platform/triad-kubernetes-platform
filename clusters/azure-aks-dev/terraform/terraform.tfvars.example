@@ -1,0 +1,26 @@
+subscription_id    = "00000000-0000-0000-0000-000000000000"
+tenant_id          = "00000000-0000-0000-0000-000000000000"
+location           = "eastus"
+resource_group_name = "triad-azure-dev-rg"
+
+cluster_name       = "triad-azure-dev-aks"
+# Pick a non-preview version returned by:
+# az aks get-versions --location eastus --query "orchestrators[?isPreview==null||isPreview==\`false\`].orchestratorVersion" -o tsv
+kubernetes_version = "REPLACE_WITH_AKS_SUPPORTED_VERSION"
+
+aks_subnet_id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/triad-azure-dev-rg/providers/Microsoft.Network/virtualNetworks/triad-azure-dev-vnet/subnets/aks-subnet"
+ingress_subnet_id  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/triad-azure-dev-rg/providers/Microsoft.Network/virtualNetworks/triad-azure-dev-vnet/subnets/ingress-subnet"
+acr_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/triad-azure-dev-rg/providers/Microsoft.ContainerRegistry/registries/triaddevacr1234"
+
+# Pick a VM size allowed in your subscription/region.
+# Example check:
+# az vm list-skus --location eastus --resource-type virtualMachines --query "[?restrictions==null].name" -o tsv
+node_vm_size       = "REPLACE_WITH_ALLOWED_AKS_VM_SIZE"
+node_min_count     = 3
+node_max_count     = 4
+
+tags = {
+  CostCenter = "learning"
+  Stage      = "phase5"
+  ManagedBy  = "terraform"
+}

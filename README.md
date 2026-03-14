@@ -6,12 +6,23 @@ GitOps-managed Kubernetes platform layer (EKS + AKS + GKE).
 - app-of-apps patterns
 
 Start here: platform/argocd/README.md
+Day-2 translation guide: docs/runbooks/multi-cloud-day2-translation-cheatsheet.md
 
-Current Phase 2 starting points:
+Current platform state:
 - `clusters/aws-eks-dev/`
-  - dev cluster input contract and first EKS Terraform root
+  - AWS reference cluster and Terraform root for the proven operating model
+- `clusters/azure-aks-dev/`
+  - AKS dev cluster Terraform root consuming Azure landing-zone outputs
+  - cluster lifecycle has been validated; use this as the parity path when AWS hardening milestones are closed
+- `clusters/gcp-gke-dev/`
+  - GKE dev cluster Terraform root consuming GCP landing-zone outputs
+  - cluster lifecycle has been validated; use this as the parity path when AWS hardening milestones are closed
+- `modules/azure/aks/`
+  - reusable AKS cluster module used by the Azure dev cluster root
+- `modules/gcp/gke/`
+  - reusable GKE cluster module used by the GCP dev cluster root
 - `platform/`
-  - ALB controller + external-dns + external-secrets IRSA contracts and first in-cluster NATS manifests
+  - ALB controller + external-dns + external-secrets IRSA contracts, in-cluster NATS, and admission enforcement baseline (Kyverno + policy app)
 - `apps/platform/` and `apps/workloads/`
   - first ArgoCD application split with Helm + Kustomize sources
 - `workloads/pulsecart/dev/`
@@ -34,3 +45,10 @@ Current Phase 2 starting points:
 Operational note:
 - The AWS dev cluster is now intended to be reproducible enough that it can be intentionally scaled down or torn down between active work periods to control cost, then brought back through the normal Terraform + ArgoCD flow.
 - That makes it a strong dev reference baseline, but not a production-grade platform yet.
+- The immediate next step is to harden this AWS baseline further before pushing for deeper AKS/GKE workload parity.
+
+Phase 5 operator runbook:
+- `docs/runbooks/phase5-azure-gcp-bootstrap.md`
+  - step-by-step path used to validate Azure + GCP baselines and AKS/GKE lifecycle operations
+- `docs/runbooks/aws-hardening-next-sprint.md`
+  - concrete AWS hardening backlog for the next security and reliability pass
