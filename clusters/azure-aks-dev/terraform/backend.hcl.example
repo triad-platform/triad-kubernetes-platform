@@ -1,4 +1,4 @@
 resource_group_name  = "triad-tfstate-rg"
-storage_account_name = "REPLACE_ME"
+storage_account_name = "triadtfstatebdusd7"
 container_name       = "tfstate"
 key                  = "kubernetes-platform/azure-aks-dev/terraform.tfstate"

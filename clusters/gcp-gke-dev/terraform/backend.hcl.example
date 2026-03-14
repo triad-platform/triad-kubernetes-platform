@@ -1,2 +1,2 @@
-bucket = "REPLACE_ME"
+bucket = "triad-terraform-state-dev"
 prefix = "kubernetes-platform/gcp-gke-dev"
