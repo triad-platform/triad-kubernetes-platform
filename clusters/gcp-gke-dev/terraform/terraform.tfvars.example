@@ -2,7 +2,7 @@ project_id = "triad-platform-dev"
 region     = "us-east1"
 
 cluster_name       = "triad-gcp-dev-gke"
-kubernetes_version = "1.31"
+kubernetes_version = "1.35.0"
 
 network_name                = "triad-gcp-dev-vpc"
 subnetwork_name             = "triad-gke-dev-subnet"
