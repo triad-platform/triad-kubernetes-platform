@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-bootstrap
+  namespace: kube-system
+data:
+  provider: google
+  domain_filter: cloudevopsguru.com
+  project_id: triad-platform-dev
+  region: us-east1
+  txt_owner_id: triad-gcp-gke-dev
+  cluster_id: projects/triad-platform-dev/locations/us-east1/clusters/triad-gcp-dev-gke
+  cluster_name: triad-gcp-dev-gke
+  cluster_endpoint: 35.229.104.164
+  workload_identity_pool: triad-platform-dev.svc.id.goog
+  vpc_name: triad-gcp-dev-vpc
+  vpc_self_link: https://www.googleapis.com/compute/v1/projects/triad-platform-dev/global/networks/triad-gcp-dev-vpc
+  gke_subnet_name: triad-gke-dev-subnet
+  gke_subnet_self_link: https://www.googleapis.com/compute/v1/projects/triad-platform-dev/regions/us-east1/subnetworks/triad-gke-dev-subnet
+  pods_secondary_range_name: pods
+  services_secondary_range_name: services

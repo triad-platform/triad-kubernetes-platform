@@ -35,6 +35,9 @@ terraform plan
 
 1. Run `az login` first, then make sure your active subscription matches `subscription_id`.
 2. Apply the Azure landing zone before this stack; this AKS root expects those IDs to already exist.
-3. After apply, fetch kubeconfig with:
+3. Set `kubernetes_version` from the current supported list for your region before apply:
+   - `az aks get-versions --location <location> --query "orchestrators[?isPreview==null||isPreview==\`false\`].orchestratorVersion" -o tsv`
+4. If a version is LTS-only, either use AKS Premium + LTS support plan, or choose a non-LTS supported version.
+5. After apply, fetch kubeconfig with:
    - `az aks get-credentials --resource-group <resource_group_name> --name <cluster_name> --overwrite-existing`
-4. Keep this stack focused on cluster and identity wiring; keep app/platform rollout in GitOps as done on AWS.
+6. Keep this stack focused on cluster and identity wiring; keep app/platform rollout in GitOps as done on AWS.

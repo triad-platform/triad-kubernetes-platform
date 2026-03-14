@@ -28,7 +28,6 @@ variable "cluster_name" {
 variable "kubernetes_version" {
   description = "AKS Kubernetes version."
   type        = string
-  default     = "1.31"
 }
 
 variable "aks_subnet_id" {
@@ -49,7 +48,6 @@ variable "acr_id" {
 variable "node_vm_size" {
   description = "AKS node VM size."
   type        = string
-  default     = "Standard_D4s_v5"
 }
 
 variable "node_min_count" {

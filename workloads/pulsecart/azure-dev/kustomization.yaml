@@ -1,0 +1,29 @@
+# triad-app source revision: f6a5318f274ffa8834aab8dad6bd85e295cab2a3
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: pulsecart
+
+resources:
+  - https://github.com/triad-platform/triad-app//deploy/k8s?ref=develop
+  - db-password-secret.yaml
+
+patches:
+  - path: patches/configmap.yaml
+  - path: patches/ingress.yaml
+  - path: patches/delete-secretstore.yaml
+  - path: patches/delete-externalsecret.yaml
+
+images:
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-api-gateway
+    newName: triaddevacrce18.azurecr.io/triad-app-api-gateway
+    newTag: develop
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-orders
+    newName: triaddevacrce18.azurecr.io/triad-app-orders
+    newTag: develop
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-notifications
+    newName: triaddevacrce18.azurecr.io/triad-app-notifications
+    newTag: develop
+  - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-worker
+    newName: triaddevacrce18.azurecr.io/triad-app-worker
+    newTag: develop

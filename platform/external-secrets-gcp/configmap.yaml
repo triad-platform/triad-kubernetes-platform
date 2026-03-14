@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-secrets-bootstrap
+  namespace: kube-system
+data:
+  provider: gcp-secret-manager
+  project_id: triad-platform-dev
+  region: us-east1
+  cluster_id: projects/triad-platform-dev/locations/us-east1/clusters/triad-gcp-dev-gke
+  cluster_name: triad-gcp-dev-gke
+  cluster_endpoint: 35.229.104.164
+  workload_identity_pool: triad-platform-dev.svc.id.goog
+  artifact_registry_repo_id: projects/triad-platform-dev/locations/us-east1/repositories/triad-app
+  artifact_registry_repo_name: triad-app
+  note: Bootstrap marker for GKE Workload Identity-backed external-secrets.

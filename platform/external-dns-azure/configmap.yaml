@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-bootstrap
+  namespace: kube-system
+data:
+  provider: azure
+  domain_filter: cloudevopsguru.com
+  subscription_id: 73ecfaac-d482-41a4-89ca-94851eabac2c
+  resource_group: triad-azure-dev-rg
+  resource_group_name: triad-azure-dev-rg
+  txt_owner_id: triad-azure-aks-dev
+  cluster_id: /subscriptions/73ecfaac-d482-41a4-89ca-94851eabac2c/resourceGroups/triad-azure-dev-rg/providers/Microsoft.ContainerService/managedClusters/triad-azure-dev-aks
+  cluster_name: triad-azure-dev-aks
+  oidc_issuer_url: https://eastus.oic.prod-aks.azure.com/8896947d-768a-47aa-a836-54e99ddf0975/ba855a3b-d736-4864-82fe-4ce58e9fc57b/
+  ingress_subnet_id: /subscriptions/73ecfaac-d482-41a4-89ca-94851eabac2c/resourceGroups/triad-azure-dev-rg/providers/Microsoft.Network/virtualNetworks/triad-azure-dev-vnet/subnets/ingress-subnet
+  kubelet_object_id: 81672f94-ae25-47a6-9a93-06d0470bf8c6

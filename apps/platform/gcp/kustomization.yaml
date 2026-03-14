@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - admission-policy-baseline.yaml
+  - cert-manager.yaml
+  - external-dns-prereqs.yaml
+  - external-dns.yaml
+  - external-secrets-prereqs.yaml
+  - external-secrets.yaml
+  - ingress-nginx.yaml
+  - kyverno.yaml
+  - nats.yaml
+  - observability-baseline.yaml
+  - storage-baseline.yaml

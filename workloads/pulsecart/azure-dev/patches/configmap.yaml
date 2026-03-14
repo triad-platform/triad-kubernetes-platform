@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pulsecart-config
+  namespace: pulsecart
+data:
+  # Azure landing-zone tfvars currently disable PostgreSQL Flexible Server.
+  DB_HOST: MISSING_AZURE_POSTGRES_FQDN
+  DB_PORT: "5432"
+  DB_NAME: pulsecart
+  DB_SSLMODE: require
+  DB_USER: pulsecart
+  ORDERS_URL: http://orders:8081
+  # Azure landing-zone tfvars currently disable Azure Cache for Redis.
+  REDIS_ADDR: MISSING_AZURE_REDIS_HOSTNAME:6380
+  REDIS_TLS_ENABLED: "true"
+  NATS_URL: nats://triad-nats.messaging.svc.cluster.local:4222
+  NOTIFICATIONS_URL: http://notifications:8082
+  NOTIFICATIONS_METRICS_URL: http://notifications:8082/metrics
+  WORKER_METRICS_URL: http://worker:9091/metrics
+  WORKER_METRICS_PORT: "9091"
