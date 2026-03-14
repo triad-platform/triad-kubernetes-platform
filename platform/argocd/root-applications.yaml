@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: triad-platform-apps
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   source:
@@ -25,6 +27,8 @@ kind: Application
 metadata:
   name: triad-workload-apps
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
 spec:
   project: default
   source:

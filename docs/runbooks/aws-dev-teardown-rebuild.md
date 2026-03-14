@@ -286,6 +286,12 @@ Specific health checks:
 kubectl get crd externalsecrets.external-secrets.io secretstores.external-secrets.io clustersecretstores.external-secrets.io
 ```
 
+Current intended GitOps shape:
+
+1. `external-secrets-crds` should reconcile before the `external-secrets` controller app.
+2. `external-secrets` chart-side CRD installation should remain disabled once that prereq app exists.
+3. The manual CRD recovery block below is fallback-only, not the desired steady-state rebuild path.
+
 If `external-secrets` is healthy but workloads stay `OutOfSync/Missing`, run first-principles checks:
 
 ```bash
@@ -303,7 +309,7 @@ Interpretation:
 
 then the root cause is missing CRDs in the destination cluster (most commonly `secretstores.external-secrets.io` and `clustersecretstores.external-secrets.io`).
 
-Recovery (cluster-side, no app manifest changes required):
+Fallback recovery (cluster-side, only if the explicit CRD prereq path did not converge):
 
 ```bash
 helm repo add external-secrets https://charts.external-secrets.io
