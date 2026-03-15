@@ -69,6 +69,26 @@ data:
               summary: "Orders publish errors detected"
               description: "Orders service failed to publish orders.created.v1 events."
 
+          - alert: PulseCartOrdersOutboxRelayErrors
+            expr: rate(triad_orders_outbox_relay_errors_total[5m]) > 0
+            for: 2m
+            labels:
+              severity: warning
+              service: orders
+            annotations:
+              summary: "Orders outbox relay errors detected"
+              description: "The orders outbox relay has encountered repeated errors while attempting to drain pending events."
+
+          - alert: PulseCartOrdersOutboxBacklog
+            expr: max_over_time(triad_orders_outbox_pending_events[10m]) > 0
+            for: 10m
+            labels:
+              severity: warning
+              service: orders
+            annotations:
+              summary: "Orders outbox backlog not draining"
+              description: "The orders service has had unpublished outbox events for at least 10m, which means async completion is lagging after order acceptance."
+
           - alert: PulseCartWorkerProcessingErrors
             expr: rate(triad_worker_messages_errors_total[5m]) > 0
             for: 5m
