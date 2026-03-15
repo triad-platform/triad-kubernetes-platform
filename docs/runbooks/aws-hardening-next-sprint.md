@@ -46,6 +46,7 @@ The March 14, 2026 rebuild established:
 2. The former bootstrap weakness around `external-secrets` CRDs was addressed through an explicit prereq app.
 3. Live admission validation has now passed on the rebuilt cluster.
 4. Kyverno enforcement is now acting as intended and should drive manifest quality upward rather than be bypassed.
+5. The AWS reliability drill exposed and then closed a Prometheus rule reload gap by adding automatic ConfigMap-triggered reload behavior to the observability baseline.
 
 ## Exit Signal
 

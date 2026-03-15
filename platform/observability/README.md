@@ -17,6 +17,7 @@ Scope:
 - Grafana admin credentials are now secret-backed through `external-secrets`.
 - Alertmanager now uses a secret-backed config with an SNS receiver path sourced through `external-secrets`.
 - `external-secrets` now owns those two secrets in the observability namespace, so Argo no longer competes with live secret data.
+- Prometheus now includes a `configmap-reload` sidecar so ConfigMap-delivered scrape and alert rule changes automatically call `/-/reload` without manual operator intervention.
 - Long retention and HA come later.
 
 Current access pattern:
@@ -25,6 +26,25 @@ kubectl port-forward -n observability svc/grafana 3000:3000
 kubectl port-forward -n observability svc/prometheus 9090:9090
 kubectl port-forward -n observability svc/alertmanager 9093:9093
 ```
+
+Prometheus rule troubleshooting sequence used during the March 14 AWS drill:
+```bash
+kubectl get configmap prometheus-rules -n observability -o yaml | rg 'PulseCartOrdersUnavailable|PulseCartGatewayUpstreamFailureRatio'
+kubectl port-forward -n observability svc/prometheus 9090:9090
+curl -s http://localhost:9090/api/v1/rules | rg 'PulseCartOrdersUnavailable|PulseCartGatewayUpstreamFailureRatio|state'
+curl -s http://localhost:9090/api/v1/alerts | rg 'PulseCartOrdersUnavailable|PulseCartGatewayUpstreamFailureRatio|state|activeAt'
+curl -sG http://localhost:9090/api/v1/query --data-urlencode 'query=up{job="orders"}'
+curl -sG http://localhost:9090/api/v1/query --data-urlencode 'query=max_over_time(up{job="orders"}[2m])'
+curl -X POST http://localhost:9090/-/reload
+```
+
+What those commands proved:
+
+1. Argo had updated the live ConfigMap.
+2. Prometheus had not reloaded the new rule file yet.
+3. The `orders` outage signal was real in Prometheus query data.
+4. Manual `/-/reload` made the new rules active immediately.
+5. The permanent fix is the `configmap-reload` sidecar in the Prometheus deployment.
 
 Grafana bootstrap credentials:
 - secret: `grafana-admin`
