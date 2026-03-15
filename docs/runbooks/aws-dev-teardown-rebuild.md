@@ -2,7 +2,13 @@
 
 This runbook defines the current operator path for intentionally parking the AWS dev environment to control cost, then bringing it back without ad hoc recovery work.
 
-This is a **dev-grade reproducibility runbook**, not a zero-touch environment bootstrap.
+This is a **dev-grade reproducibility runbook**. The current validated operator contract is:
+
+1. rebuild the EKS layer with Terraform
+2. refresh kubeconfig
+3. run Argo bootstrap
+
+It is still not a zero-touch production bootstrap, but it is now the tested AWS dev recovery path.
 
 ## Scope
 
@@ -422,6 +428,11 @@ The rebuild is only considered complete when all are true:
 4. public health endpoint responds
 5. observability is healthy
 6. async cloud smoke passes
+
+Validated note:
+
+1. After the explicit `external-secrets-crds` prereq app was added and the workload labels were fixed in `triad-app`, this rebuild path was re-tested successfully.
+2. The expected operator flow is now `terraform apply -> aws eks update-kubeconfig -> bootstrap-argocd.sh -> validation checks`.
 
 ## What Is Automated Versus Manual Today
 
