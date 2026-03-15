@@ -46,6 +46,22 @@ spec:
               mountPath: /etc/prometheus-rules
             - name: prometheus-data
               mountPath: /prometheus
+        - name: configmap-reload
+          image: ghcr.io/jimmidyson/configmap-reload:v0.15.0
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+          args:
+            - --volume-dir=/etc/prometheus
+            - --volume-dir=/etc/prometheus-rules
+            - --webhook-url=http://127.0.0.1:9090/-/reload
+            - --webhook-method=POST
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+            - name: prometheus-rules
+              mountPath: /etc/prometheus-rules
       volumes:
         - name: prometheus-config
           configMap:

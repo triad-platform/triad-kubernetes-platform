@@ -6,6 +6,7 @@ resources:
   - aws-load-balancer-controller-prereqs.yaml
   - aws-load-balancer-controller.yaml
   - cert-manager.yaml
+  - external-secrets-crds.yaml
   - external-dns-prereqs.yaml
   - external-dns.yaml
   - external-secrets-prereqs.yaml

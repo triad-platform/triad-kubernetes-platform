@@ -64,12 +64,16 @@ Current AWS platform app split:
 5. `external-secrets`
    - Helm chart source
    - uses a pre-created IRSA-enabled service account in `platform/external-secrets`
-6. `observability-baseline`
+6. `external-secrets-crds`
+   - repo path from the upstream `external-secrets` Git repo
+   - exists to make CRD availability a first-class prereq on blank-cluster bootstrap
+7. `observability-baseline`
    - repo path `platform/observability`
 
 Note:
 - Phase 2 public entry should ultimately resolve `pulsecart-dev.cloudevopsguru.com` through ALB to `api-gateway`.
 - After the first manual Route 53 bootstrap, `external-dns` is the intended automation path for keeping that record in sync.
+- The AWS path now treats `external-secrets` CRDs as an explicit prereq app instead of relying only on Helm chart CRD timing.
 - The Azure and GCP parity paths now have dedicated root app files and workload overlays, but still require real cloud-specific secret values, DNS credentials, and registry/image promotion wiring before smoke can pass.
 - ArgoCD becomes the normal in-cluster reconciler after bootstrap.
 - The preferred bootstrap path is now scripted; manual kubectl install commands are fallback only.

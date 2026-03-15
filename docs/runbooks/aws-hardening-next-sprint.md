@@ -15,7 +15,7 @@ The goal is not to expand cloud surface area further right now. The goal is to m
 
 1. Verify the image promotion flow in `triad-app` still matches the registries and patterns enforced by `triad-ci-security/policy/admission/`.
 2. Remove stale placeholders or contradictory examples where the real AWS account, region, ECR, and IRSA assumptions are already known.
-3. Re-run signed-image and approved-registry deny/allow validation against the live EKS cluster.
+3. Keep the live signed-image and approved-registry validation path current as the policy and workload base evolve.
 4. Capture fresh evidence for build, SBOM, scan, sign, attest, and admission outcomes.
 5. Keep the GitOps image promotion path resilient to normal branch movement so deployment churn does not create human merge work.
 
@@ -28,7 +28,7 @@ The goal is not to expand cloud surface area further right now. The goal is to m
 ## Workstream 3: Reliability Hardening
 
 1. Reconcile alert rules, dashboard expectations, and runbooks with the current AWS observability stack.
-2. Re-run at least one failure drill that exercises async order flow visibility and documented recovery.
+2. Execute the next failure drill on the synchronous path: gateway timeout plus burn-rate response.
 3. Tighten teardown/rebuild guidance where stale-lock, CRD ordering, or Argo root sync issues were previously observed.
 4. Turn the `external-secrets` CRD bootstrap recovery into a deterministic GitOps prerequisite instead of a manual post-bootstrap step.
 
@@ -43,8 +43,10 @@ The goal is not to expand cloud surface area further right now. The goal is to m
 The March 14, 2026 rebuild established:
 
 1. EKS plus ArgoCD plus workloads can be restored after intentional cost teardown.
-2. The remaining bootstrap weakness is CRD readiness on an empty cluster, not normal Argo reconciliation on an already-shaped cluster.
-3. Kyverno enforcement is now acting as intended and should drive manifest quality upward rather than be bypassed.
+2. The former bootstrap weakness around `external-secrets` CRDs was addressed through an explicit prereq app.
+3. Live admission validation has now passed on the rebuilt cluster.
+4. Kyverno enforcement is now acting as intended and should drive manifest quality upward rather than be bypassed.
+5. The AWS reliability drill exposed and then closed a Prometheus rule reload gap by adding automatic ConfigMap-triggered reload behavior to the observability baseline.
 
 ## Exit Signal
 

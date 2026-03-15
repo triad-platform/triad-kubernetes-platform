@@ -2,7 +2,13 @@
 
 This runbook defines the current operator path for intentionally parking the AWS dev environment to control cost, then bringing it back without ad hoc recovery work.
 
-This is a **dev-grade reproducibility runbook**, not a zero-touch environment bootstrap.
+This is a **dev-grade reproducibility runbook**. The current validated operator contract is:
+
+1. rebuild the EKS layer with Terraform
+2. refresh kubeconfig
+3. run Argo bootstrap
+
+It is still not a zero-touch production bootstrap, but it is now the tested AWS dev recovery path.
 
 ## Scope
 
@@ -286,6 +292,12 @@ Specific health checks:
 kubectl get crd externalsecrets.external-secrets.io secretstores.external-secrets.io clustersecretstores.external-secrets.io
 ```
 
+Current intended GitOps shape:
+
+1. `external-secrets-crds` should reconcile before the `external-secrets` controller app.
+2. `external-secrets` chart-side CRD installation should remain disabled once that prereq app exists.
+3. The manual CRD recovery block below is fallback-only, not the desired steady-state rebuild path.
+
 If `external-secrets` is healthy but workloads stay `OutOfSync/Missing`, run first-principles checks:
 
 ```bash
@@ -303,7 +315,7 @@ Interpretation:
 
 then the root cause is missing CRDs in the destination cluster (most commonly `secretstores.external-secrets.io` and `clustersecretstores.external-secrets.io`).
 
-Recovery (cluster-side, no app manifest changes required):
+Fallback recovery (cluster-side, only if the explicit CRD prereq path did not converge):
 
 ```bash
 helm repo add external-secrets https://charts.external-secrets.io
@@ -416,6 +428,11 @@ The rebuild is only considered complete when all are true:
 4. public health endpoint responds
 5. observability is healthy
 6. async cloud smoke passes
+
+Validated note:
+
+1. After the explicit `external-secrets-crds` prereq app was added and the workload labels were fixed in `triad-app`, this rebuild path was re-tested successfully.
+2. The expected operator flow is now `terraform apply -> aws eks update-kubeconfig -> bootstrap-argocd.sh -> validation checks`.
 
 ## What Is Automated Versus Manual Today
 

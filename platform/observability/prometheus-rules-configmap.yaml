@@ -9,6 +9,26 @@ data:
       - name: pulsecart-phase1
         interval: 30s
         rules:
+          - alert: PulseCartOrdersUnavailable
+            expr: max_over_time(up{job="orders"}[2m]) == 0
+            for: 2m
+            labels:
+              severity: critical
+              service: orders
+            annotations:
+              summary: "Orders service scrape target unavailable"
+              description: "Prometheus has been unable to scrape the orders service for 2m, which usually means no ready endpoints or a broken service path."
+
+          - alert: PulseCartGatewayUpstreamFailureRatio
+            expr: (sum(rate(triad_api_gateway_orders_forward_errors_total[5m])) + sum(rate(triad_api_gateway_orders_forward_timeouts_total[5m]))) / clamp_min(sum(rate(triad_api_gateway_orders_forward_requests_total[5m])), 0.001) > 0.2
+            for: 2m
+            labels:
+              severity: critical
+              service: api-gateway
+            annotations:
+              summary: "Gateway upstream failure ratio elevated"
+              description: "More than 20% of gateway order-forwarding attempts are failing or timing out over the last 5m window."
+
           - alert: PulseCartGatewayHigh5xxRate
             expr: rate(triad_api_gateway_http_response_status_500_total[5m]) > 0.1
             for: 5m
@@ -48,6 +68,26 @@ data:
             annotations:
               summary: "Orders publish errors detected"
               description: "Orders service failed to publish orders.created.v1 events."
+
+          - alert: PulseCartOrdersOutboxRelayErrors
+            expr: rate(triad_orders_outbox_relay_errors_total[5m]) > 0
+            for: 2m
+            labels:
+              severity: warning
+              service: orders
+            annotations:
+              summary: "Orders outbox relay errors detected"
+              description: "The orders outbox relay has encountered repeated errors while attempting to drain pending events."
+
+          - alert: PulseCartOrdersOutboxBacklog
+            expr: max_over_time(triad_orders_outbox_pending_events[10m]) > 0
+            for: 10m
+            labels:
+              severity: warning
+              service: orders
+            annotations:
+              summary: "Orders outbox backlog not draining"
+              description: "The orders service has had unpublished outbox events for at least 10m, which means async completion is lagging after order acceptance."
 
           - alert: PulseCartWorkerProcessingErrors
             expr: rate(triad_worker_messages_errors_total[5m]) > 0
