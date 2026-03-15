@@ -28,7 +28,7 @@ The goal is not to expand cloud surface area further right now. The goal is to m
 ## Workstream 3: Reliability Hardening
 
 1. Reconcile alert rules, dashboard expectations, and runbooks with the current AWS observability stack.
-2. Re-run at least one failure drill that exercises async order flow visibility and documented recovery.
+2. Execute the next failure drill on the synchronous path: gateway timeout plus burn-rate response.
 3. Tighten teardown/rebuild guidance where stale-lock, CRD ordering, or Argo root sync issues were previously observed.
 4. Turn the `external-secrets` CRD bootstrap recovery into a deterministic GitOps prerequisite instead of a manual post-bootstrap step.
 
