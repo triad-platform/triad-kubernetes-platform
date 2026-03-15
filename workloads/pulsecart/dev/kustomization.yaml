@@ -1,4 +1,4 @@
-# triad-app source revision: 918f759f380830305e7e2175bd35b3b94bfeeb96
+# triad-app source revision: 0c6c10ce4c9889f538133f225e777a09d633ee31
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -10,13 +10,13 @@ resources:
 images:
   - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-api-gateway
     newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-api-gateway
-    digest: sha256:7b45b7e7aa5187b2d00bdd0a42a5dcee5b68d8701738c9b48b8dd2bb9041ed24
+    digest: sha256:42d6d00e5222324b57dd84861aa5907dd2eec4d0927158165f815ca696167ea4
   - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-orders
     newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-orders
-    digest: sha256:e64cd76458279fd32ac018fa6c6156be4888acc58e384406fb5602e28c75c354
+    digest: sha256:a0bdb90326b4a3987e5e4b0dd4e7f16b60161ba2ccbcf02db1ac390e68a5ac74
   - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-notifications
     newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-notifications
-    digest: sha256:a4b63cb7cc2b89ec0917ea837e36ffee68edce3ed9b96d376cc8188deb8fbf91
+    digest: sha256:9d471c7a10ae4b035cd40de002e16e92786b8ec6084b6ac38f026de84fbc10ab
   - name: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-worker
     newName: 971146591534.dkr.ecr.us-east-1.amazonaws.com/triad-app-worker
-    digest: sha256:4958cac6fd73d77653445fe6a1e2e5a4dfad758a0c5a345b55fef0bf9c43c073
+    digest: sha256:f2fed87fea080fe2056c15c60c187542a00688cf8dcfc8b376388ee730cf922f
