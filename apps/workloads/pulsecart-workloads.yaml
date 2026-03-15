@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/triad-platform/triad-kubernetes-platform.git
     targetRevision: develop
-    path: workloads/pulsecart/drills/gateway-timeout
+    path: workloads/pulsecart/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: pulsecart
