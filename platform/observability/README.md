@@ -46,19 +46,21 @@ What those commands proved:
 4. Manual `/-/reload` made the new rules active immediately.
 5. The permanent fix is the `configmap-reload` sidecar in the Prometheus deployment.
 
-Grafana bootstrap credentials:
+Grafana access:
 - secret: `grafana-admin`
 - user key: `admin-user`
 - password key: `admin-password`
-- current placeholder password: `CHANGE-ME-OBSERVABILITY-ADMIN`
+- live source of truth: AWS Secrets Manager via `ExternalSecret`
+- the checked-in `grafana-admin-secret.yaml` file is reference-only and is not applied by this kustomization
 
-External-secrets migration path:
+Secret source of truth:
 - `SecretStore`: `observability-aws-secrets`
 - AWS secret name for Grafana: `triad/dev/observability/grafana-admin`
   - expected JSON keys: `admin_user`, `admin_password`
 - AWS secret name for Alertmanager: `triad/dev/observability/alertmanager`
   - expected JSON key: `config`
-- The `ExternalSecret` resources use `creationPolicy: Owner`, so the synced Kubernetes secrets are now owned by `external-secrets` rather than Argo bootstrap manifests.
+- The `ExternalSecret` resources use `creationPolicy: Owner`, so the synced Kubernetes secrets are owned by `external-secrets` rather than Argo bootstrap manifests.
+- The checked-in placeholder secret manifests remain only as local reference material for first-pass authoring.
 
 Preferred alert delivery path:
 - Create an SNS topic in `triad-landing-zones`
